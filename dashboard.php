@@ -74,13 +74,6 @@ if ($user->isLoggedIn()) {
                                 </a>
                             </div>
 
-                            <!-- 
-                    <li class="">
-                        <a href="info.php?id=4">
-                            <span class="glyphicon glyphicon-list"></span><span class="text">Manage Studies</span>
-                        </a>
-                    </li> -->
-
                         </div>
 
                     </div>
