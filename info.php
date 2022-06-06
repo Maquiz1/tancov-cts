@@ -274,6 +274,11 @@ if ($user->isLoggedIn()) {
                                 </ul>
                             </div>
                             <div class="block-fluid">
+                                <?php if($user->data()->power == 1){
+                                    $user=$override->get('user', 'status', 1);
+                                }else{
+                                    $users=$override->getNews('user', 'site_id',$user->data()->site_id, 'status',1);
+                                }?>
                                 <table cellpadding="0" cellspacing="0" width="100%" class="table">
                                     <thead>
                                         <tr>
@@ -648,6 +653,11 @@ if ($user->isLoggedIn()) {
                                     </li>
                                 </ul>
                             </div>
+                            <?php if($user->data()->power == 1){
+                                $clients=$override->get('clients', 'status', 1);
+                            }else {
+                                $clients=$override->getNews('clients','site_id',$user->data()->site_id, 'status',1);
+                            }?>
                             <div class="block-fluid">
                                 <table cellpadding="0" cellspacing="0" width="100%" class="table">
                                     <thead>
@@ -661,7 +671,7 @@ if ($user->isLoggedIn()) {
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <?php foreach ($override->get('clients', 'status', 1) as $client) {?>
+                                    <?php foreach ($clients as $client) {?>
                                         <tr>
                                             <td><input type="checkbox" name="checkbox" /></td>
                                             <td><?=$client['participant_id'] ?></td>
