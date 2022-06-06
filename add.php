@@ -120,10 +120,6 @@ if ($user->isLoggedIn()) {
         elseif (Input::get('add_client')) {
             $validate = new validate();
             $validate = $validate->check($_POST, array(
-                'participant_id' => array(
-                    'required' => true,
-                    'unique' => 'clients',
-                ),
                 'clinic_date' => array(
                     'required' => true,
                 ),
@@ -172,8 +168,21 @@ if ($user->isLoggedIn()) {
                         $attachment_file = '';
                     }
                     if($errorM == false){
+                        $screening_id = '';
+                        if($user->data()->site_id == 1){
+
+                        }
+                        $check_screening = true;
+                        while ($check_screening == true){
+                            $screening_id = $random->get_rand_alphanumeric(6);
+                            if($override->get('clients', 'participant_id', $screening_id)){
+                                $check_screening = true;
+                            }else{
+                                $check_screening = false;
+                            }
+                        }
                         $user->createRecord('clients', array(
-                            'participant_id' => Input::get('participant_id'),
+                            'participant_id' => $screening_id,
                             'clinic_date' => Input::get('clinic_date'),
                             'firstname' => Input::get('firstname'),
                             'lastname' => Input::get('lastname'),
@@ -193,6 +202,27 @@ if ($user->isLoggedIn()) {
                             'staff_id' => $user->data()->id,
                             'client_image' => $attachment_file,
                             'status' => 1,
+                        ));
+
+                        $client = $override->lastRow('clients', 'id')[0];
+
+                        $user->createRecord('visit', array(
+                                'visit_name' => 'Visit 1',
+                                'visit_code' => 'V1',
+                                'visit_date' => date('Y-m-d'),
+                                'visit_window' => 14,
+                                'status' => 1,
+                                'seq_no' => 1,
+                                'client_id' => $client['id'],
+                        ));
+
+                        $user->createRecord('visit', array(
+                            'visit_name' => 'Visit 2',
+                            'visit_code' => 'V2',
+                            'visit_window' => 14,
+                            'status' => 0,
+                            'seq_no' => 2,
+                            'client_id' => $client['id'],
                         ));
 
                         $successMessage = 'Client Added Successful';
@@ -437,12 +467,12 @@ if ($user->isLoggedIn()) {
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="row-form clearfix">
-                                        <div class="col-md-3">ParticipantID:</div>
-                                        <div class="col-md-9">
-                                            <input value="" class="validate[required]" type="text" name="participant_id" id="participant_id" />
-                                        </div>
-                                    </div>
+<!--                                    <div class="row-form clearfix">-->
+<!--                                        <div class="col-md-3">Screening ID:</div>-->
+<!--                                        <div class="col-md-9">-->
+<!--                                            <input value="" class="validate[required]" type="text" name="participant_id" id="participant_id" />-->
+<!--                                        </div>-->
+<!--                                    </div>-->
                                     <div class="row-form clearfix">
                                         <div class="col-md-3">Date:</div>
                                         <div class="col-md-9">
@@ -630,7 +660,28 @@ if ($user->isLoggedIn()) {
 
                         </div>
                     <?php } elseif ($_GET['id'] == 7) { ?>
+                        <div class="col-md-offset-1 col-md-8">
+                            <div class="head clearfix">
+                                <div class="isw-ok"></div>
+                                <h1>Add Visit</h1>
+                            </div>
+                            <div class="block-fluid">
+                                <form id="validation" method="post">
+                                    <div class="row-form clearfix">
+                                        <div class="col-md-3">Visit Name:</div>
+                                        <div class="col-md-9">
+                                            <input value="" class="validate[required]" type="text" name="name" id="name" />
+                                        </div>
+                                    </div>
 
+                                    <div class="footer tar">
+                                        <input type="submit" name="add_site" value="Submit" class="btn btn-default">
+                                    </div>
+
+                                </form>
+                            </div>
+
+                        </div>
                     <?php } elseif ($_GET['id'] == 8) { ?>
 
                     <?php } elseif ($_GET['id'] == 9) { ?>

@@ -153,7 +153,6 @@ if ($user->isLoggedIn()) {
             $validate = $validate->check($_POST, array(
                 'participant_id' => array(
                     'required' => true,
-                    'unique' => 'clients',
                 ),
                 'clinic_date' => array(
                     'required' => true,
@@ -179,25 +178,95 @@ if ($user->isLoggedIn()) {
             ));
             if ($validate->passed()) {
                 try {
-                    $user->updateRecord('clients', array(
-                        'participant_id' => Input::get('participant_id'),
-                        'clinic_date' => Input::get('clinic_date'),
-                        'firstname' => Input::get('firstname'),
-                        'lastname' => Input::get('lastname'),
-                        'dob' => Input::get('dob'),
-                        'age' => Input::get('age'),
-                        'gender' => Input::get('gender'),
-                        'marital_status' => Input::get('marital_status'),
-                        'education_level' => Input::get('education_level'),
-                        'workplace' => Input::get('workplace'),
-                        'occupation' => Input::get('occupation'),
-                        'phone_number' => Input::get('phone_number'),
-                        'street' => Input::get('street'),
-                        'ward' => Input::get('ward'),
-                        'block_no' => Input::get('block_no'),
+                    $attachment_file = Input::get('image');print_r($attachment_file);
+                    if (!empty($_FILES['image']["tmp_name"])) {
+                        $attach_file = $_FILES['image']['type'];
+                        if ($attach_file == "image/jpeg" || $attach_file == "image/jpg" || $attach_file == "image/png" || $attach_file == "image/gif") {
+                            $folderName = 'clients/';
+                            $attachment_file = $folderName . basename($_FILES['image']['name']);
+                            if (@move_uploaded_file($_FILES['image']["tmp_name"], $attachment_file)) {
+                                $file = true;
+                            } else {
+                                {
+                                    $errorM = true;
+                                    $errorMessage = 'Your profile Picture Not Uploaded ,';
+                                }
+                            }
+                        } else {
+                            $errorM = true;
+                            $errorMessage = 'None supported file format';
+                        }//not supported format
+                    }else{
+                        $attachment_file = '';
+                    }
+                    if (!empty($_FILES['image']["tmp_name"])) {
+                        $image = $attachment_file;
+                    }else{
+                        $image = Input::get('client_image');
+                    }
+                    if($errorM == false){
+                        $user->updateRecord('clients', array(
+                            'participant_id' => Input::get('participant_id'),
+                            'clinic_date' => Input::get('clinic_date'),
+                            'firstname' => Input::get('firstname'),
+                            'lastname' => Input::get('lastname'),
+                            'dob' => Input::get('dob'),
+                            'age' => Input::get('age'),
+                            'gender' => Input::get('gender'),
+                            'marital_status' => Input::get('marital_status'),
+                            'education_level' => Input::get('education_level'),
+                            'workplace' => Input::get('workplace'),
+                            'occupation' => Input::get('occupation'),
+                            'phone_number' => Input::get('phone_number'),
+                            'street' => Input::get('street'),
+                            'ward' => Input::get('ward'),
+                            'block_no' => Input::get('block_no'),
+                            'client_image' => $image,
+                        ), Input::get('id'));
+
+                        $successMessage = 'Client Updated Successful';
+                    }
+                } catch (Exception $e) {
+                    die($e->getMessage());
+                }
+            } else {
+                $pageError = $validate->errors();
+            }
+        }
+        elseif (Input::get('edit_visit')) {
+            $validate = $validate->check($_POST, array(
+                'visit_date' => array(
+                    'required' => true,
+                ),
+            ));
+            if ($validate->passed()) {
+                try {
+                    $user->updateRecord('visit', array(
+                        'visit_date' => Input::get('visit_date'),
+                        'created_on' => date('Y-m-d'),
+                        'status' => 1,
                     ), Input::get('id'));
 
-                    $successMessage = 'Client Updated Successful';
+                    if(Input::get('seq') == 2){
+                        $user->createRecord('visit', array(
+                            'visit_name' => 'Visit 3',
+                            'visit_code' => 'V3',
+                            'visit_window' => 14,
+                            'status' => 0,
+                            'seq_no' => 3,
+                            'client_id' => Input::get('cid'),
+                        ));
+                    }
+
+                    if(Input::get('seq') == 3){
+//                        print_r(Input::get('seq'));
+                        $study_id = $override->getNews('study_id','status',0, 'site_id', $user->data()->site_id)[0];
+                        $user->updateRecord('clients',array('study_id'=>$study_id['study_id'],'enrolled'=>1),Input::get('cid'));
+                        $user->updateRecord('study_id',array('client_id'=>Input::get('cid'),'status'=>1),$study_id['id']);
+
+                        $user->visit(Input::get('cid'), Input::get('seq'));
+                    }
+                    $successMessage = 'Visit Successful Added';
                 } catch (Exception $e) {
                     die($e->getMessage());
                 }
@@ -663,17 +732,24 @@ if ($user->isLoggedIn()) {
                                     <thead>
                                     <tr>
                                         <th><input type="checkbox" name="checkall" /></th>
+                                        <td width="20">#</td>
+                                        <th width="40">Picture</th>
                                         <th width="20%">ParticipantID</th>
-                                        <th width="20%">Name</th>
-                                        <th width="20%">Gender</th>
-                                        <th width="20%">Age</th>
-                                        <th width="20%">Action</th>
+                                        <th width="10%">Name</th>
+                                        <th width="10%">Gender</th>
+                                        <th width="10%">Age</th>
+                                        <th width="40%">Action</th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <?php foreach ($clients as $client) {?>
+                                    <?php $x=1;foreach ($clients as $client) {?>
                                         <tr>
                                             <td><input type="checkbox" name="checkbox" /></td>
+                                            <td><?=$x?></td>
+                                            <td width="100">
+                                                <?php if($client['client_image'] !='' || is_null($client['client_image'])){$img=$client['client_image'];}else{$img='img/users/blank.png';}?>
+                                                <a href="#img<?= $client['id'] ?>" data-toggle="modal"><img src="<?=$img?>" width="90" height="90" class=""/></a>
+                                            </td>
                                             <td><?=$client['participant_id'] ?></td>
                                             <td> <?=$client['firstname'] . ' ' . $client['lastname'] ?></td>
                                             <td><?=$client['gender'] ?></td>
@@ -683,6 +759,7 @@ if ($user->isLoggedIn()) {
                                                 <a href="#client<?= $client['id'] ?>" role="button" class="btn btn-info" data-toggle="modal">Edit</a>
                                                 <a href="#reset<?= $client['id'] ?>" role="button" class="btn btn-warning" data-toggle="modal">Print ID</a>
                                                 <a href="#delete<?= $client['id'] ?>" role="button" class="btn btn-danger" data-toggle="modal">Delete</a>
+                                                <a href="info.php?id=4&cid=<?=$client['id']?>" role="button" class="btn btn-warning" >Schedule</a>
                                             </td>
 
                                         </tr>
@@ -698,13 +775,16 @@ if ($user->isLoggedIn()) {
                                                             <div class="row">
                                                                 <div class="block-fluid">
                                                                     <div class="row-form clearfix">
-                                                                        <div class="col-md-3">Study</div>
-                                                                        <div class="col-md-9">
+                                                                        <div class="col-md-2">Study</div>
+                                                                        <div class="col-md-6">
                                                                             <select name="position" style="width: 100%;" disabled>
                                                                                 <?php foreach ($override->getData('study') as $study) { ?>
                                                                                     <option value="<?= $study['id'] ?>"><?= $study['name'] ?></option>
                                                                                 <?php } ?>
                                                                             </select>
+                                                                        </div>
+                                                                        <div class="col-md-4 pull-right">
+                                                                            <img src="<?=$img?>" class="img-thumbnail" width="50%" height="50%"/>
                                                                         </div>
                                                                     </div>
                                                                     <div class="row-form clearfix">
@@ -826,7 +906,7 @@ if ($user->isLoggedIn()) {
                                         </div>
                                         <div class="modal fade" id="client<?= $client['id'] ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                                             <div class="modal-dialog">
-                                                <form method="post">
+                                                <form enctype="multipart/form-data" method="post">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
                                                             <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
@@ -881,6 +961,13 @@ if ($user->isLoggedIn()) {
                                                                         <div class="col-md-3">Age:</div>
                                                                         <div class="col-md-9">
                                                                             <input value="<?=$client['age']?>" class="validate[required]" type="text" name="age" id="age" />
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="row-form clearfix">
+                                                                        <div class="col-md-5">Client Image:</div>
+                                                                        <div class="col-md-7">
+                                                                            <input type="file" id="image" name="image"/>
                                                                         </div>
                                                                     </div>
 
@@ -955,7 +1042,8 @@ if ($user->isLoggedIn()) {
                                                             </div>
                                                         </div>
                                                         <div class="modal-footer">
-                                                            <input type="hidden" name="id" value="<?= $client['id'] ?>">
+                                                            <input type="hidden" name="client_image" value="<?=$client['client_image']?>"/>
+                                                            <input type="hidden" name="id" value="<?=$client['id'] ?>">
                                                             <input type="submit" name="edit_client" value="Save updates" class="btn btn-warning">
                                                             <button class="btn btn-default" data-dismiss="modal" aria-hidden="true">Close</button>
                                                         </div>
@@ -985,13 +1073,136 @@ if ($user->isLoggedIn()) {
                                                 </form>
                                             </div>
                                         </div>
-                                    <?php } ?>
+                                        <div class="modal fade" id="img<?= $client['id'] ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <form method="post">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                                            <h4>Client Image</h4>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <img src="<?=$img?>" width="350">
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button class="btn btn-default" data-dismiss="modal" aria-hidden="true">Close</button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    <?php $x++;} ?>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     <?php } elseif ($_GET['id'] == 4) { ?>
-
+<!--                        show error id client id is not available-->
+<!--                        validate site_id so that you wont be able to view client not in tou site unless admin-->
+                        <div class="col-md-12">
+                            <?php $patient = $override->get('clients', 'id', $_GET['cid'])[0]?>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="ucard clearfix">
+                                        <div class="right">
+                                            <div class="image">
+                                                <a href="#"><img src="<?=$patient['client_image']?>" width="300" class="img-thumbnail"></a>
+                                            </div>
+                                            <h5><?='Name: '.$patient['firstname'].' '.$patient['lastname'].' Age: '.$patient['age']?></h5>
+                                            <h4><strong>Screening ID: <?=$patient['participant_id']?></strong></h4>
+                                            <?php if(is_null($patient['study_id'])){$studyID='None';}else{$studyID=$patient['study_id'];}?>
+                                            <h4><strong style="font-size: larger">Study ID: <?=$studyID?></strong></h4>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="head clearfix">
+                                        <div class="isw-grid"></div>
+                                        <h1>Schedule</h1>
+                                        <ul class="buttons">
+                                            <li><a href="#" class="isw-download"></a></li>
+                                            <li><a href="#" class="isw-attachment"></a></li>
+                                            <li>
+                                                <a href="#" class="isw-settings"></a>
+                                                <ul class="dd-list">
+                                                    <li><a href="#"><span class="isw-plus"></span> New document</a></li>
+                                                    <li><a href="#"><span class="isw-edit"></span> Edit</a></li>
+                                                    <li><a href="#"><span class="isw-delete"></span> Delete</a></li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="block-fluid">
+                                        <table cellpadding="0" cellspacing="0" width="100%" class="table">
+                                            <thead>
+                                            <tr>
+                                                <th width="5%">#</th>
+                                                <th width="15%">Visit Name</th>
+                                                <th width="15%">Visit Code</th>
+                                                <th width="15%">Visit Date</th>
+                                                <th width="10%">Status</th>
+                                                <th width="35%">Action</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <?php $x=1;foreach ($override->get('visit', 'client_id', $_GET['cid']) as $visit) { ?>
+                                                <tr>
+                                                    <td><?=$x?></td>
+                                                    <td> <?= $visit['visit_name'] ?></td>
+                                                    <td> <?= $visit['visit_code'] ?></td>
+                                                    <td> <?= $visit['visit_date'] ?></td>
+                                                    <?php if($visit['status'] == 1) {?>
+                                                        <td><a href="#<?= $visit['id'] ?>" role="button" class="btn btn-success">Done</a></td>
+                                                    <?php }elseif($visit['status'] == 0){?>
+                                                        <td><a href="#<?= $visit['id'] ?>" role="button" class="btn btn-warning">Pending</a></td>
+                                                        <td><a href="#addVisit<?= $visit['id'] ?>" role="button" class="btn btn-info" data-toggle="modal">Add</a></td>
+                                                    <?php }elseif ($visit['status'] == 2){?>
+                                                        <td><a href="#<?= $visit['id'] ?>" role="button" class="btn btn-warning">Not Done</a></td>
+                                                    <?php }?>
+                                                </tr>
+                                                <div class="modal fade" id="addVisit<?= $visit['id'] ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <form method="post">
+                                                                <div class="modal-header">
+                                                                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                                                    <h4>Add Visit</h4>
+                                                                </div>
+                                                                <div class="modal-body modal-body-np">
+                                                                    <div class="row">
+                                                                        <div class="block-fluid">
+                                                                            <div class="row-form clearfix">
+                                                                                <div class="col-md-3">Visit:</div>
+                                                                                <div class="col-md-9"><input type="text" name="name" value="<?= $visit['visit_name'].' ('.$visit['visit_code'].')' ?>" disabled /></div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="row-form clearfix">
+                                                                            <div class="col-md-3">Visit Date:</div>
+                                                                            <div class="col-md-9">
+                                                                                <input value="" class="validate[required,custom[date]]" type="text" name="visit_date" id="visit_date"/> <span>Example: 2010-12-01</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="dr"><span></span></div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <input type="hidden" name="id" value="<?=$visit['id'] ?>">
+                                                                    <input type="hidden" name="seq" value="<?=$visit['seq_no'] ?>">
+                                                                    <input type="hidden" name="cid" value="<?=$visit['client_id'] ?>">
+                                                                    <input type="submit" name="edit_visit" class="btn btn-warning" value="Save">
+                                                                    <button class="btn btn-default" data-dismiss="modal" aria-hidden="true">Close</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            <?php $x++;} ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     <?php } elseif ($_GET['id'] == 5) { ?>
 
                     <?php } elseif ($_GET['id'] == 6) { ?>

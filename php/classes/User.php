@@ -89,6 +89,26 @@ class User {
         return $os_platform;
     }
 
+    function visit($client_id, $seq){
+        $frd = array();
+        if($this->_override->getCount('visit','client_id', $client_id) == 3){$sq = $seq;
+            foreach ($this->_override->getData('schedule') as $schedule){$sq++;$visit_name='Visit '.$sq;
+                $last_visit_date=$this->_override->getlastRow('visit','client_id', $client_id, 'id')[0]['visit_date'];
+                $nxt_visit = date('Y-m-d', strtotime($last_visit_date. ' + '.$schedule['days'].' days'));
+                $this->createRecord('visit',array(
+                    'visit_name' => $visit_name,
+                    'visit_code' => $schedule['visit'],
+                    'visit_date' => $nxt_visit,
+                    'visit_window' => $schedule['window'],
+                    'client_id' => $client_id,
+                    'seq_no' => $sq,
+                    'status' => 0,
+                ));
+            }
+        }
+        return $frd;
+    }
+
     function getBrowser() {
 
         global $user_agent;

@@ -58,7 +58,7 @@ if ($user->data()->accessLevel == 1) {
                     </li>
                     <li>
                         <a href="info.php?id=3">
-                            <span class="glyphicon glyphicon-registration-mark"></span><span class="text">Manage Clients</span>
+                            <span class="glyphicon glyphicon-registration-mark"></span><span class="text">Clients</span>
                         </a>
                     </li>
                 </ul>

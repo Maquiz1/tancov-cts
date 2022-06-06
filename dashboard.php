@@ -13,22 +13,13 @@ $noC = 0;
 $noD = 0;
 $users = $override->getData('user');
 if ($user->isLoggedIn()) {
-    if (Input::exists('post')) {
-        if (Input::get('edit_file_status')) {
-            if (Input::get('status') == 1) {
-                $st = 0;
-            } else {
-                $st = 2;
-            }
-            try {
-                $user->updateRecord('file_request', array('status' => $st, 'approved_on' => date('Y-m-d H:i:s'), 'approve_staff' => $user->data()->id), Input::get('request_id'));
-                $user->updateRecord('study_files', array('status' => 1), Input::get('id'));
-            } catch (Exception $e) {
-                $e->getMessage();
-            }
-            $successMessage = 'File Status changed successful';
-        }
-    }
+   if($user->data()->power == 1){
+       $screened = $override->getNo('clients');
+       $enrolled = $override->getCount('clients', 'enrolled', 1);
+   }else{
+       $screened = $override->getCount('clients', 'site_id', $user->data()->site_id);
+       $enrolled = $override->countData('clients', 'enrolled', 1,'site_id', $user->data()->site_id);
+   }
 } else {
     Redirect::to('index.php');
 }
@@ -69,8 +60,8 @@ if ($user->isLoggedIn()) {
                                 <span class="mChartBar" sparkType="bar" sparkBarColor="white">
                                     <!--130,190,260,230,290,400,340,360,390-->
                                 </span>
-                                <a href="info.php?id=4">
-                                    <span class="number"></span>
+                                <a href="#">
+                                    <span class="number"><?=$screened?></span>
                                 </a>
                             </div>
 
@@ -86,8 +77,8 @@ if ($user->isLoggedIn()) {
                                 <span class="mChartBar" sparkType="bar" sparkBarColor="white">
                                     <!--5,10,15,20,23,21,25,20,15,10,25,20,10-->
                                 </span>
-                                <a href="info.php?id=3">
-                                    <span class="number"></span>
+                                <a href="#">
+                                    <span class="number"><?=$enrolled?></span>
                                 </a>
                             </div>
                         </div>
@@ -103,7 +94,7 @@ if ($user->isLoggedIn()) {
                                     <!--240,234,150,290,310,240,210,400,320,198,250,222,111,240,221,340,250,190-->
                                 </span>
                                 <a href="info.php?id=6">
-                                    <span class="number"></span>
+                                    <span class="number">0</span>
                                 </a>
                             </div>
 
@@ -134,43 +125,84 @@ if ($user->isLoggedIn()) {
                                 <?= $successMessage ?>
                             </div>
                         <?php } ?>
-                        <div class="head clearfix">
-                            <div class="isw-grid"></div>
-                            <h1>File </h1>
-                            <ul class="buttons">
-                                <li><a href="view_pdf.php?pdf=1" class="isw-download"></a></li>
-                                <li><a href="#" class="isw-attachment"></a></li>
-                                <li>
-                                    <a href="#" class="isw-settings"></a>
-                                    <ul class="dd-list">
-                                        <li><a href="#"><span class="isw-plus"></span> New document</a></li>
-                                        <li><a href="#"><span class="isw-edit"></span> Edit</a></li>
-                                        <li><a href="#"><span class="isw-delete"></span> Delete</a></li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="block-fluid">
-                            <table cellpadding="0" cellspacing="0" width="100%" class="table">
-                                <thead>
+                        <div class="col-md-12">
+                            <div class="head clearfix">
+                                <div class="isw-grid"></div>
+                                <h1>Today Schedule</h1>
+                                <ul class="buttons">
+                                    <li><a href="#" class="isw-download"></a></li>
+                                    <li><a href="#" class="isw-attachment"></a></li>
+                                    <li>
+                                        <a href="#" class="isw-settings"></a>
+                                        <ul class="dd-list">
+                                            <li><a href="#"><span class="isw-plus"></span> New document</a></li>
+                                            <li><a href="#"><span class="isw-edit"></span> Edit</a></li>
+                                            <li><a href="#"><span class="isw-delete"></span> Delete</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                            <?php if($user->data()->power == 1){
+                                $visits=$override->getNews('visit', 'visit_date', date('Y-m-d'), 'status', 0);
+                            }else {
+                                $visits=$override->get3('visit', 'visit_date', date('Y-m-d'), 'site_id',$user->data()->site_id, 'status', 0);
+                            }?>
+                            <div class="block-fluid">
+                                <table cellpadding="0" cellspacing="0" width="100%" class="table">
+                                    <thead>
                                     <tr>
-                                        <th width="7%">ID</th>
-                                        <th width="5%">Study</th>
-                                        <th width="5%">Type</th>
-                                        <th width="15%">Requested Date</th>
-                                        <th width="15%">Requested Staff</th>
-                                        <th width="15%">File Status</th>
-                                        <th width="15%">Request Status</th>
-                                        <?php if($user->data()->power == 1){?>
-                                        <th width="25%">Manage</th>
-                                        <?php }?>
+                                        <th><input type="checkbox" name="checkall" /></th>
+                                        <td width="20">#</td>
+                                        <th width="40">Picture</th>
+                                        <th width="20%">Screening ID</th>
+                                        <th width="20%">Study ID</th>
+                                        <th width="10%">Name</th>
+                                        <th width="10%">Gender</th>
+                                        <th width="10%">Age</th>
+                                        <th width="30%">Action</th>
                                     </tr>
-                                </thead>
+                                    </thead>
+                                    <tbody>
+                                    <?php $x=1;foreach ($visits as $visit) {$client=$override->get('clients', 'id', $visit['client_id'])[0] ?>
+                                        <tr>
+                                            <td><input type="checkbox" name="checkbox" /></td>
+                                            <td><?=$x?></td>
+                                            <td width="100">
+                                                <?php if($client['client_image'] !='' || is_null($client['client_image'])){$img=$client['client_image'];}else{$img='img/users/blank.png';}?>
+                                                <a href="#img<?= $client['id'] ?>" data-toggle="modal"><img src="<?=$img?>" width="90" height="90" class=""/></a>
+                                            </td>
+                                            <td><?=$client['participant_id'] ?></td>
+                                            <td><?=$client['study_id'] ?></td>
+                                            <td> <?=$client['firstname'] . ' ' . $client['lastname'] ?></td>
+                                            <td><?=$client['gender'] ?></td>
+                                            <td><?=$client['age'] ?></td>
+                                            <td>
+                                                <a href="info.php?id=4&cid=<?=$client['id']?>" role="button" class="btn btn-warning" >Schedule</a>
+                                            </td>
 
-                                <tbody>
-
-                                </tbody>
-                            </table>
+                                        </tr>
+                                        <div class="modal fade" id="img<?= $client['id'] ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <form method="post">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                                            <h4>Client Image</h4>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <img src="<?=$img?>" width="350">
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button class="btn btn-default" data-dismiss="modal" aria-hidden="true">Close</button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                        <?php $x++;} ?>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -179,8 +211,6 @@ if ($user->isLoggedIn()) {
                 <div class="row">
 
                 </div>
-
-                <div class="dr"><span></span></div>
             </div>
 
         </div>

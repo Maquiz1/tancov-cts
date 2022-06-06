@@ -86,4 +86,16 @@ class OverideData{
         return $this->_pdo->query("DELETE FROM $table WHERE $field = $value");
     }
 
+    public function lastRow($table,$value){
+        $query = $this->_pdo->query("SELECT * FROM $table ORDER BY $value DESC LIMIT 1");
+        $result = $query->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function getlastRow($table,$where,$value,$id){
+        $query = $this->_pdo->query("SELECT * FROM $table WHERE  $where='$value' ORDER BY $id DESC LIMIT 1");
+        $result = $query->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
 }
