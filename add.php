@@ -141,6 +141,7 @@ if ($user->isLoggedIn()) {
                 ),
                 'phone_number' => array(
                     'required' => true,
+                    'unique' => 'clients',
                 ),
                 'age' => array(
                     'required' => true,
@@ -149,15 +150,14 @@ if ($user->isLoggedIn()) {
             if ($validate->passed()) {
                 $errorM = false;
                 try {
-                    $attachment_file = Input::get('client_image');
+                    $attachment_file = Input::get('image');
                     if (!empty($_FILES['image']["tmp_name"])) {
                         $attach_file = $_FILES['image']['type'];
-                        if ($attach_file == "image/jpeg" || $attach_file == "image/jpg" || $attach_file == "image/png" || $attach_file == "image/gif") {$successMessage = 'Jesus';
+                        if ($attach_file == "image/jpeg" || $attach_file == "image/jpg" || $attach_file == "image/png" || $attach_file == "image/gif") {
                             $folderName = 'clients/';
                             $attachment_file = $folderName . basename($_FILES['image']['name']);
-                            if (move_uploaded_file($_FILES['image']["tmp_name"], $attachment_file)) {
+                            if (@move_uploaded_file($_FILES['image']["tmp_name"], $attachment_file)) {
                                 $file = true;
-
                             } else {
                                 {
                                     $errorM = true;
@@ -425,7 +425,7 @@ if ($user->isLoggedIn()) {
                                 <h1>Add Client</h1>
                             </div>
                             <div class="block-fluid">
-                                <form id="validation" enctype="multipart/form-data" method="post">
+                                <form enctype="multipart/form-data" method="post">
 
                                     <div class="row-form clearfix">
                                         <div class="col-md-3">Study</div>
@@ -479,7 +479,7 @@ if ($user->isLoggedIn()) {
                                     <div class="row-form clearfix">
                                         <div class="col-md-5">Client Image:</div>
                                         <div class="col-md-7">
-                                            <input type="file" name="client_image"/>
+                                            <input type="file" id="image" name="image"/>
                                         </div>
                                     </div>
 
