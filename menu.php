@@ -64,6 +64,20 @@ if ($user->data()->accessLevel == 1) {
                 </ul>
             </li>
 
+            <li class="active">
+                <a href="printer.php">
+                    <span class="isw-print"></span><span class="text">Print Barcode</span>
+                </a>
+            </li>
+
+            <?php if($user->data()->power == 1){?>
+                <li class="active">
+                    <a href="zebra.php">
+                        <span class="isw-print"></span><span class="text">Zebra Print</span>
+                    </a>
+                </li>
+            <?php }?>
+
             <li class="openable">
                 <a href="#"><span class="isw-tag"></span><span class="text">Extra</span></a>
                 <ul>
@@ -109,6 +123,11 @@ if ($user->data()->accessLevel == 1) {
                         </a>
                     </li>
                 </ul>
+            </li>
+            <li class="active">
+                <a href="printer.php">
+                    <span class="isw-print"></span><span class="text">Print Barcode</span>
+                </a>
             </li>
 
             <li class="openable">
