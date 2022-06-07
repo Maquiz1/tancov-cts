@@ -32,7 +32,7 @@ if ($user->data()->accessLevel == 1) {
                 <span class="isw-grid"></span><span class="text">Dashboard</span>
             </a>
         </li>
-        <?php if ($user->data()->accessLevel == 1) { ?>
+        <?php if ($user->data()->accessLevel == 1 || $user->data()->accessLevel == 2) { ?>
             <li class="openable">
                 <a href="#"><span class="isw-user"></span><span class="text">Staff</span></a>
                 <ul>
@@ -95,6 +95,32 @@ if ($user->data()->accessLevel == 1) {
                 </ul>
             </li>
         <?php } else { ?>
+            <li class="openable">
+                <a href="#"><span class="isw-users"></span><span class="text">Clients</span></a>
+                <ul>
+                    <li>
+                        <a href="add.php?id=4">
+                            <span class="glyphicon glyphicon-user"></span><span class="text">Add Client</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="info.php?id=3">
+                            <span class="glyphicon glyphicon-registration-mark"></span><span class="text">Clients</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="openable">
+                <a href="#"><span class="isw-tag"></span><span class="text">Extra</span></a>
+                <ul>
+                    <li>
+                        <a href="info.php?id=5">
+                            <span class="glyphicon glyphicon-list"></span><span class="text">Study IDs</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
 
         <?php } ?>
     </ul>
