@@ -8,6 +8,7 @@ $random = new Random();
 $successMessage = null;
 $pageError = null;
 $errorMessage = null;
+$numRec=10;
 if ($user->isLoggedIn()) {
     if (Input::exists('post')) {
         $validate = new validate();
@@ -1204,7 +1205,159 @@ if ($user->isLoggedIn()) {
                             </div>
                         </div>
                     <?php } elseif ($_GET['id'] == 5) { ?>
-
+                        <?php if($user->data()->power == 1){?>
+                            <div class="col-md-6">
+                                <div class="head clearfix">
+                                    <div class="isw-grid"></div>
+                                    <h1>List of IDs</h1>
+                                    <ul class="buttons">
+                                        <li><a href="#" class="isw-download"></a></li>
+                                        <li><a href="#" class="isw-attachment"></a></li>
+                                        <li>
+                                            <a href="#" class="isw-settings"></a>
+                                            <ul class="dd-list">
+                                                <li><a href="#"><span class="isw-plus"></span> New document</a></li>
+                                                <li><a href="#"><span class="isw-edit"></span> Edit</a></li>
+                                                <li><a href="#"><span class="isw-delete"></span> Delete</a></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="block-fluid">
+                                    <table cellpadding="0" cellspacing="0" width="100%" class="table">
+                                        <thead>
+                                        <tr>
+                                            <th><input type="checkbox" name="checkall" /></th>
+                                            <td width="40">#</td>
+                                            <th width="70">STUDY ID</th>
+                                            <th width="80%">STATUS</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <?php $x=1;foreach ($override->get('study_id', 'site_id', 1) as $study_id) {?>
+                                            <tr>
+                                                <td><input type="checkbox" name="checkbox" /></td>
+                                                <td><?=$x?></td>
+                                                <td><?=$study_id['study_id'] ?></td>
+                                                <td>
+                                                    <?php if($study_id['status'] == 1){?>
+                                                        <a href="#" role="button" class="btn btn-success" >Assigned</a>
+                                                    <?php }else{?>
+                                                        <a href="#" role="button" class="btn btn-warning" >Not Assigned</a>
+                                                    <?php }?>
+                                                </td>
+                                            </tr>
+                                            <?php $x++;} ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="head clearfix">
+                                    <div class="isw-grid"></div>
+                                    <h1>List of IDs</h1>
+                                    <ul class="buttons">
+                                        <li><a href="#" class="isw-download"></a></li>
+                                        <li><a href="#" class="isw-attachment"></a></li>
+                                        <li>
+                                            <a href="#" class="isw-settings"></a>
+                                            <ul class="dd-list">
+                                                <li><a href="#"><span class="isw-plus"></span> New document</a></li>
+                                                <li><a href="#"><span class="isw-edit"></span> Edit</a></li>
+                                                <li><a href="#"><span class="isw-delete"></span> Delete</a></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="block-fluid">
+                                    <table cellpadding="0" cellspacing="0" width="100%" class="table">
+                                        <thead>
+                                        <tr>
+                                            <th><input type="checkbox" name="checkall" /></th>
+                                            <td width="40">#</td>
+                                            <th width="70">STUDY ID</th>
+                                            <th width="80%">STATUS</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <?php $x=1;foreach ($override->get('study_id', 'site_id', 2) as $study_id) {?>
+                                            <tr>
+                                                <td><input type="checkbox" name="checkbox" /></td>
+                                                <td><?=$x?></td>
+                                                <td><?=$study_id['study_id'] ?></td>
+                                                <td>
+                                                    <?php if($study_id['status'] == 1){?>
+                                                        <a href="#" role="button" class="btn btn-success" >Assigned</a>
+                                                    <?php }else{?>
+                                                        <a href="#" role="button" class="btn btn-warning" >Not Assigned</a>
+                                                    <?php }?>
+                                                </td>
+                                            </tr>
+                                            <?php $x++;} ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        <?php }elseif($user->data()->power == 0){?>
+                            <div class="col-md-6">
+                                <div class="head clearfix">
+                                    <div class="isw-grid"></div>
+                                    <h1>List of IDs</h1>
+                                    <ul class="buttons">
+                                        <li><a href="#" class="isw-download"></a></li>
+                                        <li><a href="#" class="isw-attachment"></a></li>
+                                        <li>
+                                            <a href="#" class="isw-settings"></a>
+                                            <ul class="dd-list">
+                                                <li><a href="#"><span class="isw-plus"></span> New document</a></li>
+                                                <li><a href="#"><span class="isw-edit"></span> Edit</a></li>
+                                                <li><a href="#"><span class="isw-delete"></span> Delete</a></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="block-fluid">
+                                    <table cellpadding="0" cellspacing="0" width="100%" class="table">
+                                        <thead>
+                                        <tr>
+                                            <th><input type="checkbox" name="checkall" /></th>
+                                            <td width="40">#</td>
+                                            <th width="70">STUDY ID</th>
+                                            <th width="80%">STATUS</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <?php $x=1;
+                                        $pagNum=$override->getCount('study_id', 'site_id', $user->data()->site_id);
+                                        $pages = ceil($pagNum / $numRec);if(!$_GET['page'] || $_GET['page'] == 1){$page = 0;}else{$page = ($_GET['page']*$numRec)-$numRec;}
+                                        foreach ($override->getWithLimit('study_id', 'site_id', $user->data()->site_id,$page,$numRec) as $study_id) {?>
+                                            <tr>
+                                                <td><input type="checkbox" name="checkbox" /></td>
+                                                <td><?=$x?></td>
+                                                <td><?=$study_id['study_id'] ?></td>
+                                                <td>
+                                                    <?php if($study_id['status'] == 1){?>
+                                                        <a href="#" role="button" class="btn btn-success" >Assigned</a>
+                                                    <?php }else{?>
+                                                        <a href="#" role="button" class="btn btn-warning" >Not Assigned</a>
+                                                    <?php }?>
+                                                </td>
+                                            </tr>
+                                            <?php $x++;} ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="pull-right">
+                                    <div class="btn-group">
+                                        <a href="info.php?id=5&page=<?php if(($_GET['page']-1) > 0){echo $_GET['page']-1;}else{echo 1;}?>" class="btn btn-default"> < </a>
+                                        <?php for($i=1;$i<=$pages;$i++){?>
+                                            <a href="info.php?id=5&page=<?=$_GET['id']?>&page=<?=$i?>" class="btn btn-default <?php if($i == $_GET['page']){echo 'active';}?>"><?=$i?></a>
+                                        <?php } ?>
+                                        <a href="info.php?id=5&page=<?php if(($_GET['page']+1) <= $pages){echo $_GET['page']+1;}else{echo $i-1;}?>" class="btn btn-default"> > </a>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php }?>
                     <?php } elseif ($_GET['id'] == 6) { ?>
 
                     <?php } elseif ($_GET['id'] == 7) { ?>
