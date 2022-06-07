@@ -70,7 +70,7 @@ if($user->isLoggedIn()) {
         <div class="workplace">
 
             <div class="page-header">
-                <h1>User info <small>FileTrack</small></h1>
+                <h1>User info <small>TanCov</small></h1>
             </div>
             <div class="row">
                 <div class="col-md-6">
