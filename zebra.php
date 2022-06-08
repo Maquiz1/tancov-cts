@@ -47,6 +47,7 @@
         {
 
             var x=1;var y='';var f=0;var id=document.getElementById('study_id').value;
+            var code=document.getElementById('code').value;
             var no=Number(document.getElementById('no_label').value);
 
             while (f<2){
@@ -58,7 +59,8 @@
             while(x < no+1){
                 if(x < 10){y='0'+x}else{y=x}
                 // var dataToWrite ='^XA^BY1.5,2,70^FO102,50^BC^FD'+id+'-'+y+'^FS^XZ'
-                var dataToWrite ='^XA^CF0,20^FO70,15^FDTANCoV-1^FS^CF0,15^FO10,45^FDDA001V1-081^FS^FO10,65^FDNasopharyngeal Swab^FS^FO10,85^FD11/03/2023^FS^FO200,30^BQN,2,5^FD12345678^FS^XZ'
+                var dataToWrite = code;
+
                 selected_device.send(dataToWrite, undefined, errorCallback);
                 x++;
             }
@@ -93,6 +95,8 @@ Selected Device: <select id="selected_device" onchange=onDeviceSelected(this);><
 <input type="number" name="no_label" id="no_label"><br><br>
 <label for="fname">Study/Screening ID : </label>
 <input type="text" name="study_id" id="study_id"><br><br>
+<label for="fname">CODES : </label>
+<textarea id="code" name="code" rows="6"></textarea>
 <button id="myButton">Print Barcode</button>
 <script>
     var button = document.querySelector('#myButton');
