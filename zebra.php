@@ -57,7 +57,8 @@
 
             while(x < no+1){
                 if(x < 10){y='0'+x}else{y=x}
-                var dataToWrite ='^XA^BY1.5,2,70^FO102,50^BC^FD'+id+'-'+y+'^FS^XZ'
+                // var dataToWrite ='^XA^BY1.5,2,70^FO102,50^BC^FD'+id+'-'+y+'^FS^XZ'
+                var dataToWrite ='^XA^CF0,20^FO70,15^FDTANCoV-1^FS^CF0,15^FO10,45^FDDA001V1-081^FS^FO10,65^FDNasopharyngeal Swab^FS^FO10,85^FD11/03/2023^FS^FO200,30^BQN,2,5^FD12345678^FS^XZ'
                 selected_device.send(dataToWrite, undefined, errorCallback);
                 x++;
             }
