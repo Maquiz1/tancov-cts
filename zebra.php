@@ -47,7 +47,6 @@
         {
 
             var x=1;var y='';var f=0;var id=document.getElementById('study_id').value;
-            var code=document.getElementById('code').value;
             var no=Number(document.getElementById('no_label').value);
 
             while (f<2){
@@ -94,8 +93,6 @@ Selected Device: <select id="selected_device" onchange=onDeviceSelected(this);><
 <input type="number" name="no_label" id="no_label"><br><br>
 <label for="fname">Study/Screening ID : </label>
 <input type="text" name="study_id" id="study_id"><br><br>
-<label for="fname">CODES : </label>
-<textarea id="code" name="code" rows="6"></textarea>
 <button id="myButton">Print Barcode</button>
 <script>
     var button = document.querySelector('#myButton');
