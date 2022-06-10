@@ -90,7 +90,6 @@ class User {
     }
 
     function visit($client_id, $seq){
-        $frd = array();
         if($this->_override->getCount('visit','client_id', $client_id) == 3){$sq = $seq;
             foreach ($this->_override->getData('schedule') as $schedule){$sq++;$visit_name='Visit '.$sq;
                 $last_visit_date=$this->_override->getlastRow('visit','client_id', $client_id, 'id')[0]['visit_date'];
@@ -106,7 +105,7 @@ class User {
                 ));
             }
         }
-        return $frd;
+        return true;
     }
 
     function getBrowser() {
