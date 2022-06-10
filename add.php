@@ -132,6 +132,15 @@ if ($user->isLoggedIn()) {
                 'dob' => array(
                     'required' => true,
                 ),
+                'id_number' => array(
+                    'required' => true,
+                ),
+                'id_type' => array(
+                    'required' => true,
+                ),
+                'population_group' => array(
+                    'required' => true,
+                ),
                 'street' => array(
                     'required' => true,
                 ),
@@ -169,26 +178,22 @@ if ($user->isLoggedIn()) {
                     }
                     if($errorM == false){
                         $screening_id = '';
-                        if($user->data()->site_id == 1){
 
-                        }
-                        $check_screening = true;
-                        while ($check_screening == true){
-                            $screening_id = $random->get_rand_alphanumeric(6);
-                            if($override->get('clients', 'participant_id', $screening_id)){
-                                $check_screening = true;
-                            }else{
-                                $check_screening = false;
-                            }
-                        }
+                        $check_screening=$override->getNews('study_id','status', 0, 'site_id', $user->data()->site_id)[0];
+                        $s_id = $check_screening['study_id'];
+
                         $user->createRecord('clients', array(
-                            'participant_id' => $screening_id,
+                            'participant_id' => $s_id,
+                            'study_id' => $s_id,
                             'clinic_date' => Input::get('clinic_date'),
                             'firstname' => Input::get('firstname'),
                             'lastname' => Input::get('lastname'),
                             'dob' => Input::get('dob'),
                             'age' => Input::get('age'),
+                            'id_number' => Input::get('id_number'),
+                            'id_type' => Input::get('id_type'),
                             'gender' => Input::get('gender'),
+                            'population_group' => Input::get('population_group'),
                             'marital_status' => Input::get('marital_status'),
                             'education_level' => Input::get('education_level'),
                             'workplace' => Input::get('workplace'),
@@ -205,6 +210,8 @@ if ($user->isLoggedIn()) {
                         ));
 
                         $client = $override->lastRow('clients', 'id')[0];
+
+                        $user->updateRecord('study_id', array('status'=>1), $check_screening['id']);
 
                         $user->createRecord('visit', array(
                                 'visit_name' => 'Visit 1',
@@ -467,12 +474,6 @@ if ($user->isLoggedIn()) {
                                             </select>
                                         </div>
                                     </div>
-<!--                                    <div class="row-form clearfix">-->
-<!--                                        <div class="col-md-3">Screening ID:</div>-->
-<!--                                        <div class="col-md-9">-->
-<!--                                            <input value="" class="validate[required]" type="text" name="participant_id" id="participant_id" />-->
-<!--                                        </div>-->
-<!--                                    </div>-->
                                     <div class="row-form clearfix">
                                         <div class="col-md-3">Date:</div>
                                         <div class="col-md-9">
@@ -502,7 +503,7 @@ if ($user->isLoggedIn()) {
                                     <div class="row-form clearfix">
                                         <div class="col-md-3">Age:</div>
                                         <div class="col-md-9">
-                                            <input value="" class="validate[required]" type="text" name="age" id="age" />
+                                            <input value="" class="validate[required]" type="number" name="age" id="age" />
                                         </div>
                                     </div>
 
@@ -520,6 +521,38 @@ if ($user->isLoggedIn()) {
                                                 <option value="">Select</option>
                                                 <option value="male">Male</option>
                                                 <option value="female">Female</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="row-form clearfix">
+                                        <div class="col-md-3">ID Number:</div>
+                                        <div class="col-md-9">
+                                            <input value="" class="validate[required]" type="text" name="id_number" id="id_number" />
+                                        </div>
+                                    </div>
+
+                                    <div class="row-form clearfix">
+                                        <div class="col-md-3">Identification Type</div>
+                                        <div class="col-md-9">
+                                            <select name="id_type" style="width: 100%;" required>
+                                                <option value="">Select</option>
+                                                <option value="Driving License">Driving License</option>
+                                                <option value="Voters ID">Voters ID</option>
+                                                <option value="National ID">National ID</option>
+                                                <option value="Employment ID">Employment ID</option>
+                                                <option value="Introductory Letter">Introductory Letter</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="row-form clearfix">
+                                        <div class="col-md-3">Population Group</div>
+                                        <div class="col-md-9">
+                                            <select name="population_group" style="width: 100%;" required>
+                                                <option value="">Select</option>
+                                                <option value="General Population">General Population</option>
+                                                <option value="Police and Prison Forces">Police and Prison Forces</option>
                                             </select>
                                         </div>
                                     </div>

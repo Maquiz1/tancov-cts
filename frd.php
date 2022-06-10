@@ -7,13 +7,16 @@ $random = new Random();
 
 $x = 1;
 
-while($x<76){
+while($x<500){
     if($x<10){
         $DA = 'DA00'.$x;
         $MB = 'MB00'.$x;
-    }else{
+    }elseif($x<100){
         $DA = 'DA0'.$x;
         $MB = 'MB0'.$x;
+    }else{
+        $DA = 'DA'.$x;
+        $MB = 'MB'.$x;
     }
     $user->createRecord('study_id',array(
         'study_id' => $DA,

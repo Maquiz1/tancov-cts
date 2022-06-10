@@ -8,7 +8,7 @@ $random = new Random();
 $successMessage = null;
 $pageError = null;
 $errorMessage = null;
-$numRec=10;
+$numRec=25;
 if ($user->isLoggedIn()) {
     if (Input::exists('post')) {
         $validate = new validate();
@@ -167,6 +167,9 @@ if ($user->isLoggedIn()) {
                 'dob' => array(
                     'required' => true,
                 ),
+                'population_group' => array(
+                    'required' => true,
+                ),
                 'street' => array(
                     'required' => true,
                 ),
@@ -213,8 +216,11 @@ if ($user->isLoggedIn()) {
                             'lastname' => Input::get('lastname'),
                             'dob' => Input::get('dob'),
                             'age' => Input::get('age'),
+                            'id_number' => Input::get('id_number'),
+                            'id_type' => Input::get('id_type'),
                             'gender' => Input::get('gender'),
                             'marital_status' => Input::get('marital_status'),
+                            'population_group' => Input::get('population_group'),
                             'education_level' => Input::get('education_level'),
                             'workplace' => Input::get('workplace'),
                             'occupation' => Input::get('occupation'),
@@ -239,35 +245,45 @@ if ($user->isLoggedIn()) {
                 'visit_date' => array(
                     'required' => true,
                 ),
+                'visit_status' => array(
+                    'required' => true,
+                ),
             ));
             if ($validate->passed()) {
                 try {
-                    $user->updateRecord('visit', array(
-                        'visit_date' => Input::get('visit_date'),
-                        'created_on' => date('Y-m-d'),
-                        'status' => 1,
-                    ), Input::get('id'));
-
-                    if(Input::get('seq') == 2){
-                        $user->createRecord('visit', array(
-                            'visit_name' => 'Visit 3',
-                            'visit_code' => 'V3',
-                            'visit_window' => 14,
-                            'status' => 0,
-                            'seq_no' => 3,
-                            'client_id' => Input::get('cid'),
-                        ));
-                    }
-
                     if(Input::get('seq') == 3){
-//                        print_r(Input::get('seq'));
-                        $study_id = $override->getNews('study_id','status',0, 'site_id', $user->data()->site_id)[0];
-                        $user->updateRecord('clients',array('study_id'=>$study_id['study_id'],'enrolled'=>1),Input::get('cid'));
-                        $user->updateRecord('study_id',array('client_id'=>Input::get('cid'),'status'=>1),$study_id['id']);
+                        if(Input::get('eligible')==1 && Input::get('consent')==1){
+                            $user->updateRecord('visit', array(
+                                'visit_date' => Input::get('visit_date'),
+                                'created_on' => date('Y-m-d'),
+                                'status' => Input::get('visit_status'),
+                            ), Input::get('id'));
 
-                        $user->visit(Input::get('cid'), Input::get('seq'));
+                            $user->visit(Input::get('cid'), Input::get('seq'));
+
+                            $successMessage = 'Visit Successful Added';
+                        }else{
+                            $errorMessage='Please make sure, client meet eligibility criteria and signed Consent form';
+                        }
+
+                    }else{
+                        $user->updateRecord('visit', array(
+                            'visit_date' => Input::get('visit_date'),
+                            'created_on' => date('Y-m-d'),
+                            'status' => Input::get('visit_status'),
+                        ), Input::get('id'));
+
+                        if(Input::get('seq') == 2){
+                            $user->createRecord('visit', array(
+                                'visit_name' => 'Visit 3',
+                                'visit_code' => 'V3',
+                                'visit_window' => 14,
+                                'status' => 0,
+                                'seq_no' => 3,
+                                'client_id' => Input::get('cid'),
+                            ));
+                        }
                     }
-                    $successMessage = 'Visit Successful Added';
                 } catch (Exception $e) {
                     die($e->getMessage());
                 }
@@ -839,6 +855,39 @@ if ($user->isLoggedIn()) {
                                                                     </div>
 
                                                                     <div class="row-form clearfix">
+                                                                        <div class="col-md-3">ID Number:</div>
+                                                                        <div class="col-md-9">
+                                                                            <input value="<?=$client['id_number']?>" class="validate[required]" type="text" name="id_number" id="id_number" disabled/>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="row-form clearfix">
+                                                                        <div class="col-md-3">Identification Type</div>
+                                                                        <div class="col-md-9">
+                                                                            <select name="id_type" style="width: 100%;" disabled>
+                                                                                <option value="<?=$client['id_type']?>"><?=$client['id_type']?></option>
+                                                                                <option value="Driving License">Driving License</option>
+                                                                                <option value="Voters ID">Voters ID</option>
+                                                                                <option value="National ID">National ID</option>
+                                                                                <option value="Employment ID">Employment ID</option>
+                                                                                <option value="Introductory Letter">Introductory Letter</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="row-form clearfix">
+                                                                        <div class="col-md-3">Population Group</div>
+                                                                        <div class="col-md-9">
+                                                                            <select name="population_group" style="width: 100%;" disabled>
+                                                                                <option value="<?=$client['population_group']?>"><?=$client['population_group']?></option>
+                                                                                <option value="General Population">General Population</option>
+                                                                                <option value="Police and Prison Forces">Police and Prison Forces</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+
+
+                                                                    <div class="row-form clearfix">
                                                                         <div class="col-md-3">Marital Status</div>
                                                                         <div class="col-md-9">
                                                                             <select name="marital_status" style="width: 100%;" disabled>
@@ -982,6 +1031,37 @@ if ($user->isLoggedIn()) {
                                                                             </select>
                                                                         </div>
                                                                     </div>
+                                                                    <div class="row-form clearfix">
+                                                                        <div class="col-md-3">ID Number:</div>
+                                                                        <div class="col-md-9">
+                                                                            <input value="<?=$client['id_number']?>" class="validate[required]" type="text" name="id_number" id="id_number" />
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="row-form clearfix">
+                                                                        <div class="col-md-3">Identification Type</div>
+                                                                        <div class="col-md-9">
+                                                                            <select name="id_type" style="width: 100%;" required>
+                                                                                <option value="<?=$client['id_type']?>"><?=$client['id_type']?></option>
+                                                                                <option value="Driving License">Driving License</option>
+                                                                                <option value="Voters ID">Voters ID</option>
+                                                                                <option value="National ID">National ID</option>
+                                                                                <option value="Employment ID">Employment ID</option>
+                                                                                <option value="Introductory Letter">Introductory Letter</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="row-form clearfix">
+                                                                        <div class="col-md-3">Population Group</div>
+                                                                        <div class="col-md-9">
+                                                                            <select name="population_group" style="width: 100%;" required>
+                                                                                <option value="<?=$client['population_group']?>"><?=$client['population_group']?></option>
+                                                                                <option value="General Population">General Population</option>
+                                                                                <option value="Police and Prison Forces">Police and Prison Forces</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
 
                                                                     <div class="row-form clearfix">
                                                                         <div class="col-md-3">Marital Status</div>
@@ -1110,9 +1190,7 @@ if ($user->isLoggedIn()) {
                                                 <a href="#"><img src="<?=$patient['client_image']?>" width="300" class="img-thumbnail"></a>
                                             </div>
                                             <h5><?='Name: '.$patient['firstname'].' '.$patient['lastname'].' Age: '.$patient['age']?></h5>
-                                            <h4><strong>Screening ID: <?=$patient['participant_id']?></strong></h4>
-                                            <?php if(is_null($patient['study_id'])){$studyID='None';}else{$studyID=$patient['study_id'];}?>
-                                            <h4><strong style="font-size: larger">Study ID: <?=$studyID?></strong></h4>
+                                            <h4><strong style="font-size: larger">Study ID: <?=$patient['participant_id']?></strong></h4>
                                         </div>
                                     </div>
                                 </div>
@@ -1140,17 +1218,20 @@ if ($user->isLoggedIn()) {
                                                 <th width="5%">#</th>
                                                 <th width="15%">Visit Name</th>
                                                 <th width="15%">Visit Code</th>
+                                                <th width="15%">Visit Type</th>
                                                 <th width="15%">Visit Date</th>
                                                 <th width="10%">Status</th>
                                                 <th width="35%">Action</th>
                                             </tr>
                                             </thead>
                                             <tbody>
-                                            <?php $x=1;foreach ($override->get('visit', 'client_id', $_GET['cid']) as $visit) { ?>
+                                            <?php $x=1;foreach ($override->get('visit', 'client_id', $_GET['cid']) as $visit) {
+                                                if($visit['visit_code'] == 'V1' || $visit['visit_code'] == 'V2'){$v_typ='Screening';}elseif ($visit['visit_code'] == 'V3'){$v_typ='Enrollment';}else{$v_typ='Follow Up';}?>
                                                 <tr>
                                                     <td><?=$x?></td>
-                                                    <td> <?= $visit['visit_name'] ?></td>
-                                                    <td> <?= $visit['visit_code'] ?></td>
+                                                    <td> <?=$visit['visit_name'] ?></td>
+                                                    <td> <?=$visit['visit_code'] ?></td>
+                                                    <td> <?=$v_typ ?></td>
                                                     <td> <?= $visit['visit_date'] ?></td>
                                                     <?php if($visit['status'] == 1) {?>
                                                         <td><a href="#<?= $visit['id'] ?>" role="button" class="btn btn-success">Done</a></td>
@@ -1177,10 +1258,48 @@ if ($user->isLoggedIn()) {
                                                                                 <div class="col-md-9"><input type="text" name="name" value="<?= $visit['visit_name'].' ('.$visit['visit_code'].')' ?>" disabled /></div>
                                                                             </div>
                                                                         </div>
+                                                                        <div class="block-fluid">
+                                                                            <div class="row-form clearfix">
+                                                                                <div class="col-md-3">Visit Type:</div>
+                                                                                <div class="col-md-9"><input type="text" name="name" value="<?=$v_typ?>" disabled /></div>
+                                                                            </div>
+                                                                        </div>
                                                                         <div class="row-form clearfix">
-                                                                            <div class="col-md-3">Visit Date:</div>
+                                                                            <div class="col-md-3">Status</div>
                                                                             <div class="col-md-9">
-                                                                                <input value="" class="validate[required,custom[date]]" type="text" name="visit_date" id="visit_date"/> <span>Example: 2010-12-01</span>
+                                                                                <select name="visit_status" style="width: 100%;" required>
+                                                                                    <option value="">Select</option>
+                                                                                    <option value="1">Attended</option>
+                                                                                    <option value="2">Missed Visit</option>
+                                                                                </select>
+                                                                            </div>
+                                                                        </div>
+                                                                        <?php if($visit['visit_code'] == 'V3'){$vd='Enrollment '?>
+                                                                            <div class="row-form clearfix">
+                                                                                <div class="col-md-5">Eligibility:</div>
+                                                                                <div class="col-md-7">
+                                                                                    <select name="eligible" style="width: 100%;" required>
+                                                                                        <option value="">Select</option>
+                                                                                        <option value="1">Eligible</option>
+                                                                                        <option value="2">Not Eligible</option>
+                                                                                    </select>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="row-form clearfix">
+                                                                                <div class="col-md-5">Consent:</div>
+                                                                                <div class="col-md-7">
+                                                                                    <select name="consent" style="width: 100%;" required>
+                                                                                        <option value="">Select</option>
+                                                                                        <option value="1">Signed and Confirm</option>
+                                                                                        <option value="2">Not Signed</option>
+                                                                                    </select>
+                                                                                </div>
+                                                                            </div>
+                                                                        <?php }else{$vd='';}?>
+                                                                        <div class="row-form clearfix">
+                                                                            <div class="col-md-3"><?=$vd?>Date:</div>
+                                                                            <div class="col-md-9">
+                                                                                <input value="<?=$visit['visit_date']?>" class="validate[required,custom[date]]" type="text" name="visit_date" id="visit_date"/> <span>Example: 2010-12-01</span>
                                                                             </div>
                                                                         </div>
                                                                         <div class="dr"><span></span></div>
@@ -1188,6 +1307,7 @@ if ($user->isLoggedIn()) {
                                                                 </div>
                                                                 <div class="modal-footer">
                                                                     <input type="hidden" name="id" value="<?=$visit['id'] ?>">
+                                                                    <input type="hidden" name="vc" value="<?=$visit['visit_code'] ?>">
                                                                     <input type="hidden" name="seq" value="<?=$visit['seq_no'] ?>">
                                                                     <input type="hidden" name="cid" value="<?=$visit['client_id'] ?>">
                                                                     <input type="submit" name="edit_visit" class="btn btn-warning" value="Save">
@@ -1205,159 +1325,66 @@ if ($user->isLoggedIn()) {
                             </div>
                         </div>
                     <?php } elseif ($_GET['id'] == 5) { ?>
-                        <?php if($user->data()->power == 1){?>
-                            <div class="col-md-6">
-                                <div class="head clearfix">
-                                    <div class="isw-grid"></div>
-                                    <h1>List of IDs</h1>
-                                    <ul class="buttons">
-                                        <li><a href="#" class="isw-download"></a></li>
-                                        <li><a href="#" class="isw-attachment"></a></li>
-                                        <li>
-                                            <a href="#" class="isw-settings"></a>
-                                            <ul class="dd-list">
-                                                <li><a href="#"><span class="isw-plus"></span> New document</a></li>
-                                                <li><a href="#"><span class="isw-edit"></span> Edit</a></li>
-                                                <li><a href="#"><span class="isw-delete"></span> Delete</a></li>
-                                            </ul>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div class="block-fluid">
-                                    <table cellpadding="0" cellspacing="0" width="100%" class="table">
-                                        <thead>
+                        <div class="col-md-6">
+                            <div class="head clearfix">
+                                <div class="isw-grid"></div>
+                                <h1>List of IDs</h1>
+                                <ul class="buttons">
+                                    <li><a href="#" class="isw-download"></a></li>
+                                    <li><a href="#" class="isw-attachment"></a></li>
+                                    <li>
+                                        <a href="#" class="isw-settings"></a>
+                                        <ul class="dd-list">
+                                            <li><a href="#"><span class="isw-plus"></span> New document</a></li>
+                                            <li><a href="#"><span class="isw-edit"></span> Edit</a></li>
+                                            <li><a href="#"><span class="isw-delete"></span> Delete</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="block-fluid">
+                                <table cellpadding="0" cellspacing="0" width="100%" class="table">
+                                    <thead>
+                                    <tr>
+                                        <th><input type="checkbox" name="checkall" /></th>
+                                        <td width="40">#</td>
+                                        <th width="70">STUDY ID</th>
+                                        <th width="80%">STATUS</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <?php $x=1;
+                                    $pagNum=$override->getCount('study_id', 'site_id', $user->data()->site_id);
+                                    $pages = ceil($pagNum / $numRec);if(!$_GET['page'] || $_GET['page'] == 1){$page = 0;}else{$page = ($_GET['page']*$numRec)-$numRec;}
+                                    foreach ($override->getWithLimit('study_id', 'site_id', $user->data()->site_id,$page,$numRec) as $study_id) {?>
                                         <tr>
-                                            <th><input type="checkbox" name="checkall" /></th>
-                                            <td width="40">#</td>
-                                            <th width="70">STUDY ID</th>
-                                            <th width="80%">STATUS</th>
+                                            <td><input type="checkbox" name="checkbox" /></td>
+                                            <td><?=$x?></td>
+                                            <td><?=$study_id['study_id'] ?></td>
+                                            <td>
+                                                <?php if($study_id['status'] == 1){?>
+                                                    <a href="#" role="button" class="btn btn-success" >Assigned</a>
+                                                <?php }else{?>
+                                                    <a href="#" role="button" class="btn btn-warning" >Not Assigned</a>
+                                                <?php }?>
+                                            </td>
                                         </tr>
-                                        </thead>
-                                        <tbody>
-                                        <?php $x=1;foreach ($override->get('study_id', 'site_id', 1) as $study_id) {?>
-                                            <tr>
-                                                <td><input type="checkbox" name="checkbox" /></td>
-                                                <td><?=$x?></td>
-                                                <td><?=$study_id['study_id'] ?></td>
-                                                <td>
-                                                    <?php if($study_id['status'] == 1){?>
-                                                        <a href="#" role="button" class="btn btn-success" >Assigned</a>
-                                                    <?php }else{?>
-                                                        <a href="#" role="button" class="btn btn-warning" >Not Assigned</a>
-                                                    <?php }?>
-                                                </td>
-                                            </tr>
-                                            <?php $x++;} ?>
-                                        </tbody>
-                                    </table>
+                                        <?php $x++;} ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="pull-left">
+                                <div class="btn-group">
+                                    <a href="info.php?id=5&page=<?php if(($_GET['page']-1) > 0){echo $_GET['page']-1;}else{echo 1;}?>" class="btn btn-default"> < </a>
+                                    <?php for($i=1;$i<=$pages;$i++){?>
+                                        <a href="info.php?id=5&page=<?=$_GET['id']?>&page=<?=$i?>" class="btn btn-default <?php if($i == $_GET['page']){echo 'active';}?>"><?=$i?></a>
+                                    <?php } ?>
+                                    <a href="info.php?id=5&page=<?php if(($_GET['page']+1) <= $pages){echo $_GET['page']+1;}else{echo $i-1;}?>" class="btn btn-default"> > </a>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="head clearfix">
-                                    <div class="isw-grid"></div>
-                                    <h1>List of IDs</h1>
-                                    <ul class="buttons">
-                                        <li><a href="#" class="isw-download"></a></li>
-                                        <li><a href="#" class="isw-attachment"></a></li>
-                                        <li>
-                                            <a href="#" class="isw-settings"></a>
-                                            <ul class="dd-list">
-                                                <li><a href="#"><span class="isw-plus"></span> New document</a></li>
-                                                <li><a href="#"><span class="isw-edit"></span> Edit</a></li>
-                                                <li><a href="#"><span class="isw-delete"></span> Delete</a></li>
-                                            </ul>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div class="block-fluid">
-                                    <table cellpadding="0" cellspacing="0" width="100%" class="table">
-                                        <thead>
-                                        <tr>
-                                            <th><input type="checkbox" name="checkall" /></th>
-                                            <td width="40">#</td>
-                                            <th width="70">STUDY ID</th>
-                                            <th width="80%">STATUS</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <?php $x=1;foreach ($override->get('study_id', 'site_id', 2) as $study_id) {?>
-                                            <tr>
-                                                <td><input type="checkbox" name="checkbox" /></td>
-                                                <td><?=$x?></td>
-                                                <td><?=$study_id['study_id'] ?></td>
-                                                <td>
-                                                    <?php if($study_id['status'] == 1){?>
-                                                        <a href="#" role="button" class="btn btn-success" >Assigned</a>
-                                                    <?php }else{?>
-                                                        <a href="#" role="button" class="btn btn-warning" >Not Assigned</a>
-                                                    <?php }?>
-                                                </td>
-                                            </tr>
-                                            <?php $x++;} ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        <?php }elseif($user->data()->power == 0){?>
-                            <div class="col-md-6">
-                                <div class="head clearfix">
-                                    <div class="isw-grid"></div>
-                                    <h1>List of IDs</h1>
-                                    <ul class="buttons">
-                                        <li><a href="#" class="isw-download"></a></li>
-                                        <li><a href="#" class="isw-attachment"></a></li>
-                                        <li>
-                                            <a href="#" class="isw-settings"></a>
-                                            <ul class="dd-list">
-                                                <li><a href="#"><span class="isw-plus"></span> New document</a></li>
-                                                <li><a href="#"><span class="isw-edit"></span> Edit</a></li>
-                                                <li><a href="#"><span class="isw-delete"></span> Delete</a></li>
-                                            </ul>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div class="block-fluid">
-                                    <table cellpadding="0" cellspacing="0" width="100%" class="table">
-                                        <thead>
-                                        <tr>
-                                            <th><input type="checkbox" name="checkall" /></th>
-                                            <td width="40">#</td>
-                                            <th width="70">STUDY ID</th>
-                                            <th width="80%">STATUS</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <?php $x=1;
-                                        $pagNum=$override->getCount('study_id', 'site_id', $user->data()->site_id);
-                                        $pages = ceil($pagNum / $numRec);if(!$_GET['page'] || $_GET['page'] == 1){$page = 0;}else{$page = ($_GET['page']*$numRec)-$numRec;}
-                                        foreach ($override->getWithLimit('study_id', 'site_id', $user->data()->site_id,$page,$numRec) as $study_id) {?>
-                                            <tr>
-                                                <td><input type="checkbox" name="checkbox" /></td>
-                                                <td><?=$x?></td>
-                                                <td><?=$study_id['study_id'] ?></td>
-                                                <td>
-                                                    <?php if($study_id['status'] == 1){?>
-                                                        <a href="#" role="button" class="btn btn-success" >Assigned</a>
-                                                    <?php }else{?>
-                                                        <a href="#" role="button" class="btn btn-warning" >Not Assigned</a>
-                                                    <?php }?>
-                                                </td>
-                                            </tr>
-                                            <?php $x++;} ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <div class="pull-right">
-                                    <div class="btn-group">
-                                        <a href="info.php?id=5&page=<?php if(($_GET['page']-1) > 0){echo $_GET['page']-1;}else{echo 1;}?>" class="btn btn-default"> < </a>
-                                        <?php for($i=1;$i<=$pages;$i++){?>
-                                            <a href="info.php?id=5&page=<?=$_GET['id']?>&page=<?=$i?>" class="btn btn-default <?php if($i == $_GET['page']){echo 'active';}?>"><?=$i?></a>
-                                        <?php } ?>
-                                        <a href="info.php?id=5&page=<?php if(($_GET['page']+1) <= $pages){echo $_GET['page']+1;}else{echo $i-1;}?>" class="btn btn-default"> > </a>
-                                    </div>
-                                </div>
-                            </div>
-                        <?php }?>
+                        </div>
                     <?php } elseif ($_GET['id'] == 6) { ?>
 
                     <?php } elseif ($_GET['id'] == 7) { ?>
@@ -1379,9 +1406,9 @@ if ($user->isLoggedIn()) {
             }, 'show');
         });
     <?php } ?>
-    if (window.history.replaceState) {
-        window.history.replaceState(null, null, window.location.href);
-    }
+    // if (window.history.replaceState) {
+    //     window.history.replaceState(null, null, window.location.href);
+    // }
     $(document).ready(function() {
         $('#wait_ds').hide();
         $('#region').change(function() {
