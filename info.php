@@ -1406,9 +1406,9 @@ if ($user->isLoggedIn()) {
             }, 'show');
         });
     <?php } ?>
-    // if (window.history.replaceState) {
-    //     window.history.replaceState(null, null, window.location.href);
-    // }
+    if (window.history.replaceState) {
+        window.history.replaceState(null, null, window.location.href);
+    }
     $(document).ready(function() {
         $('#wait_ds').hide();
         $('#region').change(function() {
