@@ -1178,8 +1178,6 @@ if ($user->isLoggedIn()) {
                             </div>
                         </div>
                     <?php } elseif ($_GET['id'] == 4) { ?>
-<!--                        show error id client id is not available-->
-<!--                        validate site_id so that you wont be able to view client not in tou site unless admin-->
                         <div class="col-md-12">
                             <?php $patient = $override->get('clients', 'id', $_GET['cid'])[0]?>
                             <div class="row">
