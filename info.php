@@ -1407,56 +1407,6 @@ if ($user->isLoggedIn()) {
     if (window.history.replaceState) {
         window.history.replaceState(null, null, window.location.href);
     }
-    $(document).ready(function() {
-        $('#wait_ds').hide();
-        $('#region').change(function() {
-            var getUid = $(this).val();
-            $('#wait_ds').show();
-            $.ajax({
-                url: "process.php?cnt=region",
-                method: "GET",
-                data: {
-                    getUid: getUid
-                },
-                success: function(data) {
-                    $('#ds_data').html(data);
-                    $('#wait_ds').hide();
-                }
-            });
-
-        });
-        $('#wait_wd').hide();
-        $('#ds_data').change(function() {
-            $('#wait_wd').hide();
-            var getUid = $(this).val();
-            $.ajax({
-                url: "process.php?cnt=district",
-                method: "GET",
-                data: {
-                    getUid: getUid
-                },
-                success: function(data) {
-                    $('#wd_data').html(data);
-                    $('#wait_wd').hide();
-                }
-            });
-
-        });
-        $('#download').change(function() {
-            var getUid = $(this).val();
-            $.ajax({
-                url: "process.php?cnt=download",
-                method: "GET",
-                data: {
-                    getUid: getUid
-                },
-                success: function(data) {
-
-                }
-            });
-
-        });
-    });
 </script>
 
 </html>
