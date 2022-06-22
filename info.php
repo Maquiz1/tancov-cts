@@ -341,7 +341,7 @@ if ($user->isLoggedIn()) {
                 <?php } ?>
 
                 <div class="row">
-                    <?php if ($_GET['id'] == 1 && $user->data()->accessLevel == 1) { ?>
+                    <?php if ($_GET['id'] == 1 && ($user->data()->position == 1 || $user->data()->position == 2)) { ?>
                         <div class="col-md-12">
                             <div class="head clearfix">
                                 <div class="isw-grid"></div>

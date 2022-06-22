@@ -291,7 +291,7 @@ if ($user->isLoggedIn()) {
                     </div>
                 <?php } ?>
                 <div class="row">
-                    <?php if ($_GET['id'] == 1 && $user->data()->position == 1) { ?>
+                    <?php if ($_GET['id'] == 1 && ($user->data()->position == 1 || $user->data()->position == 2)) { ?>
                         <div class="col-md-offset-1 col-md-8">
                             <div class="head clearfix">
                                 <div class="isw-ok"></div>
