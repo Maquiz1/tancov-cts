@@ -455,7 +455,7 @@ if ($user->isLoggedIn()) {
                             </div>
 
                         </div>
-                    <?php } elseif ($_GET['id'] == 4 && $user->data()->position == 1) { ?>
+                    <?php } elseif ($_GET['id'] == 4) { ?>
                         <div class="col-md-offset-1 col-md-8">
                             <div class="head clearfix">
                                 <div class="isw-ok"></div>
@@ -669,7 +669,7 @@ if ($user->isLoggedIn()) {
                             </div>
 
                         </div>
-                    <?php } elseif ($_GET['id'] == 6) { ?>
+                    <?php } elseif ($_GET['id'] == 6 && $user->data()->position == 1) { ?>
                         <div class="col-md-offset-1 col-md-8">
                             <div class="head clearfix">
                                 <div class="isw-ok"></div>
