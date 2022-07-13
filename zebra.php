@@ -38,8 +38,7 @@
             var label_type=document.getElementById('label_type').value;
             var label_date=document.getElementById('label_date').value;
             while(x < no+1){
-                var dataToWrite ='^XA^CF0,21^FO380,20^FDTANCoV-1^FS^FO270,60^FD'+study_id+'^FS^FO270,90^FD'+
-                    label_type+'^FS^FO270,120^FD'+label_date+'^FS^BY2,2,50^FO490,0^BQN,2,3^FD '+study_id+'^FS^XZ'
+                var dataToWrite ='^XA^CF0,21^FO230,20^FDTANCoV-1^FS^FO510,20^FDTANCoV-1^FS^FO170,110^FD'+study_id+'^FS^FO450,110^FD'+study_id+'^FS^FO170,140^FD'+label_type+'^FS^FO450,140^FD'+label_type+'^FS^FO170,170^FD'+label_date+'^FS^FO450,170^FD'+label_date+'^FS^BY2,2,50^FO300,0^BQN,2,3^FDQAM'+study_id+'^FS^BY2,2,50^FO580,0^BQN,2,3^FDQAM'+study_id+'^FS^XZ'
                 selected_device.send(dataToWrite, undefined, errorCallback);
                 x++;
             }
