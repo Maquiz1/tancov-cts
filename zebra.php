@@ -57,7 +57,7 @@
     </script>
 </head>
 <body >
-<span style="padding-right:50px; font-size:200%">TANCov Label Printing</span><br/>
+<span style="padding-right:50px; font-size:200%">TANCov Label Printing &nbsp;&nbsp;&nbsp;&nbsp; <button onclick="location.href = 'dashboard.php';" id="myHome">Go Back Home</button></span><br/>
 
 Selected Device: <select id="selected_device" onchange=onDeviceSelected(this);></select> <!--  <input type="button"
 value="Change" onclick="changeDevice();">--> <br/><br/>
