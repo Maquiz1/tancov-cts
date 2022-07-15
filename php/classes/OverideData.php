@@ -98,6 +98,12 @@ class OverideData{
         return $result;
     }
 
+    public function getlastRow1($table,$where,$value,$where1,$value1,$id){
+        $query = $this->_pdo->query("SELECT * FROM $table WHERE  $where='$value' AND $where1='$value1' ORDER BY $id DESC LIMIT 1");
+        $result = $query->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
     public function getWithLimit2($table,$field,$value,$field1,$value1,$value2,$field2,$page,$numRec){
         $query = $this->_pdo->query("SELECT * FROM $table WHERE $field = '$value' AND $field1 = '$value1' AND $value2 = '$field2' limit $page,$numRec");
         $result = $query->fetchAll(PDO::FETCH_ASSOC);

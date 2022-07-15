@@ -251,41 +251,68 @@ if ($user->isLoggedIn()) {
             ));
             if ($validate->passed()) {
                 try {
-                    if(Input::get('seq') == 3){
-                        if(Input::get('eligible')==1 && Input::get('consent')==1){
-                            $user->updateRecord('visit', array(
-                                'visit_date' => Input::get('visit_date'),
-                                'created_on' => date('Y-m-d'),
-                                'status' => Input::get('visit_status'),
-                            ), Input::get('id'));
+                    $user->updateRecord('visit', array(
+                        'visit_date' => Input::get('visit_date'),
+                        'created_on' => date('Y-m-d'),
+                        'status' => Input::get('visit_status'),
+                    ), Input::get('id'));
 
-                            $user->visit(Input::get('cid'), Input::get('seq'));
-
-                            $successMessage = 'Visit Successful Added';
-                        }else{
-                            $errorMessage='Please make sure, client meet eligibility criteria and signed Consent form';
-                        }
-
-                    }else{
-                        $user->updateRecord('visit', array(
-                            'visit_date' => Input::get('visit_date'),
-                            'created_on' => date('Y-m-d'),
-                            'status' => Input::get('visit_status'),
-                        ), Input::get('id'));
-
-                        if(Input::get('seq') == 2){
-                            $user->createRecord('visit', array(
-                                'visit_name' => 'Visit 3',
-                                'visit_code' => 'V3',
-                                'visit_window' => 14,
-                                'status' => 0,
-                                'seq_no' => 3,
-                                'client_id' => Input::get('cid'),
-                            ));
-                        }
+                    if(Input::get('seq') == 2){
+                        $user->createRecord('visit', array(
+                            'visit_name' => 'Visit 3',
+                            'visit_code' => 'V3',
+                            'visit_window' => 14,
+                            'status' => 0,
+                            'seq_no' => 3,
+                            'client_id' => Input::get('cid'),
+                        ));
                     }
                 } catch (Exception $e) {
                     die($e->getMessage());
+                }
+            } else {
+                $pageError = $validate->errors();
+            }
+        }
+        elseif (Input::get('add_unscheduled')){
+            $validate = $validate->check($_POST, array(
+                'reasons' => array(
+                    'required' => true,
+                ),
+            ));
+            if ($validate->passed()) {
+                try {
+                    $user->createRecord('unscheduled', array(
+                        'visit_code' => Input::get('vc'),
+                        'seq' => Input::get('sq'),
+                        'client_id' => Input::get('cid'),
+                        'visit_date' => Input::get('visit_date'),
+                        'reasons' => Input::get('reasons'),
+                        'created_on' => date('Y-m-d'),
+                        'staff_id' => $user->data()->id,
+                        'status' => Input::get('visit_status'),
+                    ));
+                    $successMessage = 'Visit Successful Added';
+                } catch (Exception $e) {
+                    die($e->getMessage());
+                }
+            } else {
+                $pageError = $validate->errors();
+            }
+        }
+        elseif (Input::get('add_enroll')){
+            $validate = $validate->check($_POST, array(
+
+            ));
+            if ($validate->passed()) {
+                if(Input::get('eligible')==1 && Input::get('consent')==1 && Input::get('enroll_status')==1){
+                    $check=$override->getNews('visit','visit_code','V4','client_id', Input::get('cid'))[0];
+                    if($check){
+                        $user->visit(Input::get('cid'), Input::get('seq'));
+                    }
+                    $successMessage = 'Visit Successful Enrolled';
+                }else{
+                    $errorMessage='Please make sure, client meet eligibility criteria and signed Consent form';
                 }
             } else {
                 $pageError = $validate->errors();
@@ -1181,18 +1208,19 @@ if ($user->isLoggedIn()) {
                         <div class="col-md-12">
                             <?php $patient = $override->get('clients', 'id', $_GET['cid'])[0]?>
                             <div class="row">
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <div class="ucard clearfix">
                                         <div class="right">
                                             <div class="image">
-                                                <a href="#"><img src="<?=$patient['client_image']?>" width="300" class="img-thumbnail"></a>
+                                                <?php if($patient['client_image'] !='' || is_null($patient['client_image'])){$img=$patient['client_image'];}else{$img='img/users/blank.png';}?>
+                                                <a href="#"><img src="<?=$img?>" width="300" class="img-thumbnail"></a>
                                             </div>
                                             <h5><?='Name: '.$patient['firstname'].' '.$patient['lastname'].' Age: '.$patient['age']?></h5>
                                             <h4><strong style="font-size: larger">Study ID: <?=$patient['participant_id']?></strong></h4>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-9">
+                                <div class="col-md-10">
                                     <div class="head clearfix">
                                         <div class="isw-grid"></div>
                                         <h1>Schedule</h1>
@@ -1232,12 +1260,38 @@ if ($user->isLoggedIn()) {
                                                     <td> <?=$v_typ ?></td>
                                                     <td> <?= $visit['visit_date'] ?></td>
                                                     <?php if($visit['status'] == 1) {?>
-                                                        <td><a href="#<?= $visit['id'] ?>" role="button" class="btn btn-success">Done</a></td>
+                                                        <td>
+                                                            <a href="#<?= $visit['id'] ?>" role="button" class="btn btn-success">Done</a>
+                                                            <?php if($visit['seq_no'] > 3){?>
+                                                                <a href="#addUnscheduled<?= $visit['id'] ?>" role="button" class="btn btn-info" data-toggle="modal">Add Unscheduled</a>
+                                                            <?php }?>
+                                                        </td>
+                                                        <td>
+                                                            <?php if($visit['visit_code'] == 'V3'){?>
+                                                                <a href="#addEnroll<?= $visit['id'] ?>" role="button" class="btn btn-info" data-toggle="modal">Add Enrollment</a>
+                                                            <?php }?>
+                                                        </td>
                                                     <?php }elseif($visit['status'] == 0){?>
                                                         <td><a href="#<?= $visit['id'] ?>" role="button" class="btn btn-warning">Pending</a></td>
-                                                        <td><a href="#addVisit<?= $visit['id'] ?>" role="button" class="btn btn-info" data-toggle="modal">Add</a></td>
+                                                        <td>
+                                                            <a href="#addVisit<?= $visit['id'] ?>" role="button" class="btn btn-info" data-toggle="modal">Add</a>
+                                                            <?php if($visit['seq_no'] > 3){?>
+                                                                <a href="#addUnscheduled<?= $visit['id'] ?>" role="button" class="btn btn-info" data-toggle="modal">Add Unscheduled</a>
+                                                            <?php }?>
+                                                            <?php if($visit['visit_code'] == 'V3'){?>
+                                                                <a href="#addEnroll<?= $visit['id'] ?>" role="button" class="btn btn-info" data-toggle="modal">Add Enrollment</a>
+                                                            <?php }?>
+                                                        </td>
                                                     <?php }elseif ($visit['status'] == 2){?>
-                                                        <td><a href="#<?= $visit['id'] ?>" role="button" class="btn btn-warning">Not Done</a></td>
+                                                        <td>
+                                                            <a href="#<?= $visit['id'] ?>" role="button" class="btn btn-warning">Not Done</a>
+                                                            <?php if($visit['seq_no'] > 3){?>
+                                                                <a href="#addUnscheduled<?= $visit['id'] ?>" role="button" class="btn btn-info" data-toggle="modal">Add Unscheduled</a>
+                                                            <?php }?>
+                                                            <?php if($visit['visit_code'] == 'V3'){?>
+                                                                <a href="#addEnroll<?= $visit['id'] ?>" role="button" class="btn btn-info" data-toggle="modal">Add Enrollment</a>
+                                                            <?php }?>
+                                                        </td>
                                                     <?php }?>
                                                 </tr>
                                                 <div class="modal fade" id="addVisit<?= $visit['id'] ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -1263,39 +1317,29 @@ if ($user->isLoggedIn()) {
                                                                             </div>
                                                                         </div>
                                                                         <div class="row-form clearfix">
-                                                                            <div class="col-md-3">Status</div>
+                                                                            <div class="col-md-3">Current Status</div>
                                                                             <div class="col-md-9">
                                                                                 <select name="visit_status" style="width: 100%;" required>
                                                                                     <option value="">Select</option>
                                                                                     <option value="1">Attended</option>
                                                                                     <option value="2">Missed Visit</option>
+                                                                                    <option value="3">Vaccinated</option>
+                                                                                    <option value="4">Not Vaccinated</option>
+                                                                                    <option value="5">Follow Up Visit</option>
+                                                                                    <option value="6">Early Termination</option>
+                                                                                    <option value="7">Termination</option>
                                                                                 </select>
                                                                             </div>
                                                                         </div>
-                                                                        <?php if($visit['visit_code'] == 'V3'){$vd='Enrollment '?>
-                                                                            <div class="row-form clearfix">
-                                                                                <div class="col-md-5">Eligibility:</div>
-                                                                                <div class="col-md-7">
-                                                                                    <select name="eligible" style="width: 100%;" required>
-                                                                                        <option value="">Select</option>
-                                                                                        <option value="1">Eligible</option>
-                                                                                        <option value="2">Not Eligible</option>
-                                                                                    </select>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="row-form clearfix">
-                                                                                <div class="col-md-5">Consent:</div>
-                                                                                <div class="col-md-7">
-                                                                                    <select name="consent" style="width: 100%;" required>
-                                                                                        <option value="">Select</option>
-                                                                                        <option value="1">Signed and Confirm</option>
-                                                                                        <option value="2">Not Signed</option>
-                                                                                    </select>
-                                                                                </div>
-                                                                            </div>
-                                                                        <?php }else{$vd='';}?>
+
                                                                         <div class="row-form clearfix">
-                                                                            <div class="col-md-3"><?=$vd?>Date:</div>
+                                                                            <div class="col-md-3">Reasons:</div>
+                                                                            <div class="col-md-9">
+                                                                                <textarea name="reasons" rows="4" ></textarea>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="row-form clearfix">
+                                                                            <div class="col-md-3">Date:</div>
                                                                             <div class="col-md-9">
                                                                                 <input value="<?=$visit['visit_date']?>" class="validate[required,custom[date]]" type="text" name="visit_date" id="visit_date"/> <span>Example: 2010-12-01</span>
                                                                             </div>
@@ -1309,6 +1353,136 @@ if ($user->isLoggedIn()) {
                                                                     <input type="hidden" name="seq" value="<?=$visit['seq_no'] ?>">
                                                                     <input type="hidden" name="cid" value="<?=$visit['client_id'] ?>">
                                                                     <input type="submit" name="edit_visit" class="btn btn-warning" value="Save">
+                                                                    <button class="btn btn-default" data-dismiss="modal" aria-hidden="true">Close</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal fade" id="addUnscheduled<?= $visit['id'] ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <form method="post">
+                                                                <div class="modal-header">
+                                                                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                                                    <h4>Add Unscheduled Visit</h4>
+                                                                </div>
+                                                                <div class="modal-body modal-body-np">
+                                                                    <div class="row">
+                                                                        <?php $unscheduled=$override->getlastRow1('unscheduled','visit_code',$visit['visit_code'],'client_id',$visit['client_id'], 'id');
+                                                                        if($unscheduled){$sq=$unscheduled[0]['seq']+1;}else{$sq=1;}?>
+                                                                        <div class="block-fluid">
+                                                                            <div class="row-form clearfix">
+                                                                                <div class="col-md-3">Visit:</div>
+                                                                                <div class="col-md-9"><input type="text" name="name" value="<?=$visit['visit_code'].'.'.$sq?>" disabled /></div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="block-fluid">
+                                                                            <div class="row-form clearfix">
+                                                                                <div class="col-md-3">Visit Type:</div>
+                                                                                <div class="col-md-9"><input type="text" name="name" value="Unscheduled" disabled /></div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="row-form clearfix">
+                                                                            <div class="col-md-3">Status</div>
+                                                                            <div class="col-md-9">
+                                                                                <select name="visit_status" style="width: 100%;" required>
+                                                                                    <option value="">Select</option>
+                                                                                    <option value="1">Attended</option>
+                                                                                    <option value="2">Not Attended</option>
+                                                                                </select>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="row-form clearfix">
+                                                                            <div class="col-md-3">Date:</div>
+                                                                            <div class="col-md-9">
+                                                                                <input value="" class="validate[required,custom[date]]" type="text" name="visit_date" id="visit_date"/> <span>Example: 2010-12-01</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="row-form clearfix">
+                                                                            <div class="col-md-3">Reasons:</div>
+                                                                            <div class="col-md-9">
+                                                                               <textarea name="reasons" rows="4" required></textarea>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="dr"><span></span></div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <input type="hidden" name="sq" value="<?=$sq?>">
+                                                                    <input type="hidden" name="vc" value="<?=$visit['visit_code'] ?>">
+                                                                    <input type="hidden" name="seq" value="<?=$visit['seq_no'] ?>">
+                                                                    <input type="hidden" name="cid" value="<?=$visit['client_id'] ?>">
+                                                                    <input type="submit" name="add_unscheduled" class="btn btn-warning" value="Save">
+                                                                    <button class="btn btn-default" data-dismiss="modal" aria-hidden="true">Close</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal fade" id="addEnroll<?= $visit['id'] ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <form method="post">
+                                                                <div class="modal-header">
+                                                                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                                                    <h4>Add Enrollment Visit</h4>
+                                                                </div>
+                                                                <div class="modal-body modal-body-np">
+                                                                    <div class="row">
+                                                                        <div class="row-form clearfix">
+                                                                            <div class="col-md-3">Current Status</div>
+                                                                            <div class="col-md-9">
+                                                                                <select name="enroll_status" style="width: 100%;" required>
+                                                                                    <option value="">Select</option>
+                                                                                    <option value="1">Vaccinated</option>
+                                                                                    <option value="2">Not Vaccinated</option>
+                                                                                </select>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="row-form clearfix">
+                                                                            <div class="col-md-5">Eligibility:</div>
+                                                                            <div class="col-md-7">
+                                                                                <select name="eligible" style="width: 100%;" required>
+                                                                                    <option value="">Select</option>
+                                                                                    <option value="1">Eligible</option>
+                                                                                    <option value="2">Not Eligible</option>
+                                                                                </select>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="row-form clearfix">
+                                                                            <div class="col-md-5">Consent:</div>
+                                                                            <div class="col-md-7">
+                                                                                <select name="consent" style="width: 100%;" required>
+                                                                                    <option value="">Select</option>
+                                                                                    <option value="1">Signed and Confirm</option>
+                                                                                    <option value="2">Not Signed</option>
+                                                                                </select>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="row-form clearfix">
+                                                                            <div class="col-md-3">Reasons:</div>
+                                                                            <div class="col-md-9">
+                                                                                <textarea name="reasons" rows="4" ></textarea>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="row-form clearfix">
+                                                                            <div class="col-md-3">Date:</div>
+                                                                            <div class="col-md-9">
+                                                                                <input value="" class="validate[required,custom[date]]" type="text" name="visit_date" id="visit_date"/> <span>Example: 2010-12-01</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="dr"><span></span></div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <input type="hidden" name="id" value="<?=$visit['id'] ?>">
+                                                                    <input type="hidden" name="vc" value="<?=$visit['visit_code'] ?>">
+                                                                    <input type="hidden" name="seq" value="<?=$visit['seq_no'] ?>">
+                                                                    <input type="hidden" name="cid" value="<?=$visit['client_id'] ?>">
+                                                                    <input type="submit" name="add_enroll" class="btn btn-warning" value="Save">
                                                                     <button class="btn btn-default" data-dismiss="modal" aria-hidden="true">Close</button>
                                                                 </div>
                                                             </form>
