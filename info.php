@@ -254,7 +254,8 @@ if ($user->isLoggedIn()) {
                     $user->updateRecord('visit', array(
                         'visit_date' => Input::get('visit_date'),
                         'created_on' => date('Y-m-d'),
-                        'status' => Input::get('visit_status'),
+                        'status' => 1,
+                        'visit_status' => Input::get('visit_status'),
                     ), Input::get('id'));
 
                     if(Input::get('seq') == 2){
