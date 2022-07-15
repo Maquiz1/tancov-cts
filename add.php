@@ -132,9 +132,6 @@ if ($user->isLoggedIn()) {
                 'dob' => array(
                     'required' => true,
                 ),
-                'id_number' => array(
-                    'required' => true,
-                ),
                 'id_type' => array(
                     'required' => true,
                 ),
@@ -528,7 +525,7 @@ if ($user->isLoggedIn()) {
                                     <div class="row-form clearfix">
                                         <div class="col-md-3">ID Number:</div>
                                         <div class="col-md-9">
-                                            <input value="" class="validate[required]" type="text" name="id_number" id="id_number" />
+                                            <input value="" type="text" name="id_number" id="id_number" />
                                         </div>
                                     </div>
 
