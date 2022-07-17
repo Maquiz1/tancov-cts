@@ -802,7 +802,7 @@ if ($user->isLoggedIn()) {
                                             <td>
                                                 <a href="#clientView<?= $client['id'] ?>" role="button" class="btn btn-default" data-toggle="modal">View</a>
                                                 <a href="#client<?= $client['id'] ?>" role="button" class="btn btn-info" data-toggle="modal">Edit</a>
-                                                <a href="#reset<?= $client['id'] ?>" role="button" class="btn btn-warning" data-toggle="modal">Print ID</a>
+                                                <a href="id.php?cid=<?= $client['id'] ?>"  class="btn btn-warning" >Patient ID</a>
                                                 <a href="#delete<?= $client['id'] ?>" role="button" class="btn btn-danger" data-toggle="modal">Delete</a>
                                                 <a href="info.php?id=4&cid=<?=$client['id']?>" role="button" class="btn btn-warning" >Schedule</a>
                                             </td>
