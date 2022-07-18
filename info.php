@@ -958,6 +958,10 @@ if ($user->isLoggedIn()) {
                                                                         <div class="col-md-9"><input value="<?=$client['phone_number']?>" class="" type="text" name="phone_number" id="phone" disabled /> <span>Example: 0700 000 111</span></div>
                                                                     </div>
                                                                     <div class="row-form clearfix">
+                                                                        <div class="col-md-3">Other Phone Number:</div>
+                                                                        <div class="col-md-9"><input value="<?=$client['other_phone']?>" class="" type="text" name="other_phone" id="phone" disabled /> <span>Example: 0700 000 111</span></div>
+                                                                    </div>
+                                                                    <div class="row-form clearfix">
                                                                         <div class="col-md-3">Residence Street:</div>
                                                                         <div class="col-md-9"><input value="<?=$client['street']?>" class="" type="text" name="street" id="street" disabled /></div>
                                                                     </div>
@@ -969,6 +973,10 @@ if ($user->isLoggedIn()) {
                                                                     <div class="row-form clearfix">
                                                                         <div class="col-md-3">Block Number:</div>
                                                                         <div class="col-md-9"><input value="<?=$client['block_no']?>" class="" type="text" name="block_no" id="block_no"  disabled/></div>
+                                                                    </div>
+                                                                    <div class="row-form clearfix">
+                                                                        <div class="col-md-3">Comments:</div>
+                                                                        <div class="col-md-9"><textarea name="comments" rows="4" disabled><?=$client['comments']?></textarea> </div>
                                                                     </div>
                                                                 </div>
                                                                 <div class="dr"><span></span></div>

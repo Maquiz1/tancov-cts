@@ -196,6 +196,7 @@ if ($user->isLoggedIn()) {
                             'workplace' => Input::get('workplace'),
                             'occupation' => Input::get('occupation'),
                             'phone_number' => Input::get('phone_number'),
+                            'other_phone' => Input::get('other_phone'),
                             'street' => Input::get('street'),
                             'ward' => Input::get('ward'),
                             'block_no' => Input::get('block_no'),
@@ -203,6 +204,7 @@ if ($user->isLoggedIn()) {
                             'site_id' => $user->data()->site_id,
                             'staff_id' => $user->data()->id,
                             'client_image' => $attachment_file,
+                            'comments' => Input::get('comments'),
                             'status' => 1,
                         ));
 
@@ -597,6 +599,10 @@ if ($user->isLoggedIn()) {
                                         <div class="col-md-9"><input value="" class="" type="text" name="phone_number" id="phone" required /> <span>Example: 0700 000 111</span></div>
                                     </div>
                                     <div class="row-form clearfix">
+                                        <div class="col-md-3">Other Phone Number:</div>
+                                        <div class="col-md-9"><input value="" class="" type="text" name="other_phone" id="phone"  /> <span>Example: 0700 000 111</span></div>
+                                    </div>
+                                    <div class="row-form clearfix">
                                         <div class="col-md-3">Residence Street:</div>
                                         <div class="col-md-9"><input value="" class="" type="text" name="street" id="street" required /></div>
                                     </div>
@@ -608,6 +614,11 @@ if ($user->isLoggedIn()) {
                                     <div class="row-form clearfix">
                                         <div class="col-md-3">Block Number:</div>
                                         <div class="col-md-9"><input value="" class="" type="text" name="block_no" id="block_no"  /></div>
+                                    </div>
+
+                                    <div class="row-form clearfix">
+                                        <div class="col-md-3">Comments:</div>
+                                        <div class="col-md-9"><textarea name="comments" rows="4"></textarea> </div>
                                     </div>
 
                                     <div class="footer tar">
