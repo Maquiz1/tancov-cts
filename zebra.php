@@ -75,6 +75,7 @@ value="Change" onclick="changeDevice();">--> <br/><br/>
     <option value="TB Sample 2">TB Sample 2</option>
     <option value="Blood (EDTA)">Blood (EDTA)</option>
     <option value="Blood (Serum)">Blood (Serum)</option>
+    <option value="Blood Fluoride">Blood Fluoride</option>
     <option value="ACD Plasma">ACD Plasma</option>
     <option value="ACDMPBMCs">ACDMPBMCs</option>
     <option value="Citrate Blood">Citrate Blood</option>
