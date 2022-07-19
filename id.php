@@ -100,15 +100,15 @@ if ($user->isLoggedIn()) {
 
         .box-1 {
             border: 4px solid black;
-            width: 90px;
-            height: 95px;
+            width: 208px;
+            height: 208px;
             margin: -40px 25px;
             border-radius: 3px;
         }
 
         .box-1 img {
-            width: 82px;
-            height: 87px;
+            width: 200px;
+            height: 200px;
         }
 
         .box-2 {
@@ -290,6 +290,8 @@ if ($user->isLoggedIn()) {
                             <p style='font-size: 14px;'>Participant</p>
                         </div>
 
+                    </div>
+                    <div class='header'>
                     </div>
 
                     <div class='container-3'>
