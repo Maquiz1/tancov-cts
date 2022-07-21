@@ -225,10 +225,12 @@ if ($user->isLoggedIn()) {
                             'workplace' => Input::get('workplace'),
                             'occupation' => Input::get('occupation'),
                             'phone_number' => Input::get('phone_number'),
+                            'other_phone' => Input::get('other_phone'),
                             'street' => Input::get('street'),
                             'ward' => Input::get('ward'),
                             'block_no' => Input::get('block_no'),
                             'client_image' => $image,
+                            'comments' => Input::get('comments'),
                         ), Input::get('id'));
 
                         $successMessage = 'Client Updated Successful';
@@ -814,7 +816,7 @@ if ($user->isLoggedIn()) {
                                                     <div class="modal-content">
                                                         <div class="modal-header">
                                                             <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                                                            <h4>Edit Client Info</h4>
+                                                            <h4>Edit Client View</h4>
                                                         </div>
                                                         <div class="modal-body modal-body-np">
                                                             <div class="row">
@@ -1142,6 +1144,10 @@ if ($user->isLoggedIn()) {
                                                                         <div class="col-md-9"><input value="<?=$client['phone_number']?>" class="" type="text" name="phone_number" id="phone" required /> <span>Example: 0700 000 111</span></div>
                                                                     </div>
                                                                     <div class="row-form clearfix">
+                                                                        <div class="col-md-3">Other Phone Number:</div>
+                                                                        <div class="col-md-9"><input value="<?=$client['other_phone']?>" class="" type="text" name="other_phone" id="other_phone" /> <span>Example: 0700 000 111</span></div>
+                                                                    </div>
+                                                                    <div class="row-form clearfix">
                                                                         <div class="col-md-3">Residence Street:</div>
                                                                         <div class="col-md-9"><input value="<?=$client['street']?>" class="" type="text" name="street" id="street" required /></div>
                                                                     </div>
@@ -1153,6 +1159,10 @@ if ($user->isLoggedIn()) {
                                                                     <div class="row-form clearfix">
                                                                         <div class="col-md-3">Block Number:</div>
                                                                         <div class="col-md-9"><input value="<?=$client['block_no']?>" class="" type="text" name="block_no" id="block_no"  /></div>
+                                                                    </div>
+                                                                    <div class="row-form clearfix">
+                                                                        <div class="col-md-3">Comments:</div>
+                                                                        <div class="col-md-9"><textarea name="comments" rows="4"><?=$client['comments']?></textarea> </div>
                                                                     </div>
                                                                 </div>
                                                                 <div class="dr"><span></span></div>
