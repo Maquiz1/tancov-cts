@@ -182,7 +182,7 @@ if ($user->isLoggedIn()) {
             ));
             if ($validate->passed()) {
                 try {
-                    $attachment_file = Input::get('image');print_r($attachment_file);
+                    $attachment_file = Input::get('image');
                     if (!empty($_FILES['image']["tmp_name"])) {
                         $attach_file = $_FILES['image']['type'];
                         if ($attach_file == "image/jpeg" || $attach_file == "image/jpg" || $attach_file == "image/png" || $attach_file == "image/gif") {

@@ -32,13 +32,56 @@
                 }, function(){alert("Error getting local devices")},"printer");
             }, function(error){alert(error);})
         }
+        function labelType($label_type) {
+            var l_type = '';
+            switch ($label_type) {
+                case '01':
+                    l_type = 'Nasopharyngeal Swab';
+                    break;
+                case '02':
+                    l_type = 'Saliva';
+                    break;
+                case '03':
+                    l_type = 'Blood (EDTA)';
+                    break;
+                case '04':
+                    l_type = 'Blood (SST)';
+                    break;
+                case '05':
+                    l_type = 'ACD Blood';
+                    break;
+                case '06':
+                    l_type = 'Citrate Blood';
+                    break;
+                case '07':
+                    l_type = 'Urine';
+                    break;
+                case '08':
+                    l_type = 'PBMCs';
+                    break;
+                case '09':
+                    l_type = 'Plasma';
+                    break;
+                case '10':
+                    l_type = 'Serum';
+                    break;
+                case '11':
+                    l_type = "Fluoride Blood"
+                    break;
+            }
+            return l_type;
+        }
         function writeToSelectedPrinter(){
             var x=1;var study_id=document.getElementById('study_id').value;
             var no=Number(document.getElementById('no_label').value);
             var label_type=document.getElementById('label_type').value;
+            var label_name=labelType(document.getElementById('label_type').value);
+            var visit_type=document.getElementById('visit_type').value;
             var label_date=document.getElementById('label_date').value;
+            var sid = study_id+'V'+visit_type+'-'+label_type;
+            // window.alert(sid)
             while(x < no+1){
-                var dataToWrite ='^XA^CF0,21^FO230,20^FDTANCoV-1^FS^FO510,20^FDTANCoV-1^FS^FO170,110^FD'+study_id+'^FS^FO450,110^FD'+study_id+'^FS^FO170,140^FD'+label_type+'^FS^FO450,140^FD'+label_type+'^FS^FO170,170^FD'+label_date+'^FS^FO450,170^FD'+label_date+'^FS^BY2,2,50^FO300,0^BQN,2,3^FDQAM'+study_id+'^FS^BY2,2,50^FO580,0^BQN,2,3^FDQAM'+study_id+'^FS^XZ'
+                var dataToWrite ='^XA^CF0,21^FO230,20^FDTANCoV-1^FS^FO510,20^FDTanCoV-1^FS^FO170,110^FD'+sid+'^FS^FO450,110^FD'+sid+'^FS^FO170,140^FD'+label_name+'^FS^FO450,140^FD'+label_name+'^FS^FO170,170^FD'+label_date+'^FS^FO450,170^FD'+label_date+'^FS^BY2,2,50^FO300,0^BQN,2,3^FDQAM'+sid+'^FS^BY2,2,50^FO580,0^BQN,2,3^FDQAM'+sid+'^FS^XZ'
                 selected_device.send(dataToWrite, undefined, errorCallback);
                 x++;
             }
@@ -66,19 +109,35 @@ value="Change" onclick="changeDevice();">--> <br/><br/>
 <input type="number" name="no_label" id="no_label"><br><br>
 <label for="fname">Label ID : </label>
 <input type="text" name="study_id" id="study_id"><br><br>
-<label for="fname">Type : </label>
+<label for="visit_type">Visit Type : </label>
+<select name="visit_type" id="visit_type">
+    <option value="">Visit</option>
+    <option value="01">Visit 1</option>
+    <option value="02">Visit 2</option>
+    <option value="03">Visit 3</option>
+    <option value="04">Visit 4</option>
+    <option value="05">Visit 5</option>
+    <option value="06">Visit 6</option>
+    <option value="07">Visit 7</option>
+    <option value="08">Visit 8</option>
+    <option value="09">Visit 9</option>
+    <option value="10">Visit 10</option>
+    <option value="11">Visit 11</option>
+</select><br><br>
+<label for="label_type">Sample Type : </label>
 <select name="label_type" id="label_type">
     <option value="">Type</option>
-    <option value="Nasopharyngeal aspirate">Nasopharyngeal aspirate</option>
-    <option value="Nasopharyngeal swab">Nasopharyngeal Swab</option>
-    <option value="TB Sample 1">TB Sample 1</option>
-    <option value="TB Sample 2">TB Sample 2</option>
-    <option value="Blood (EDTA)">Blood (EDTA)</option>
-    <option value="Blood (Serum)">Blood (Serum)</option>
-    <option value="Blood Fluoride">Blood Fluoride</option>
-    <option value="ACD Plasma">ACD Plasma</option>
-    <option value="ACDMPBMCs">ACDMPBMCs</option>
-    <option value="Citrate Blood">Citrate Blood</option>
+    <option value="01">Nasopharyngeal Swab</option>
+    <option value="02">Saliva</option>
+    <option value="03">Blood (EDTA)</option>
+    <option value="04">Blood (SST)</option>
+    <option value="05">ACD Blood</option>
+    <option value="06">Citrate Blood</option>
+    <option value="07">Urine</option>
+    <option value="08">PBMCs</option>
+    <option value="09">Plasma</option>
+    <option value="10">Serum</option>
+    <option value="11">Fluoride Blood</option>
 </select><br><br>
 <label for="fname">Date : </label>
 <input type="text" name="label_date" id="label_date"><br><br>
