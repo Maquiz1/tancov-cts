@@ -310,7 +310,7 @@ if ($user->isLoggedIn()) {
             if ($validate->passed()) {
                 if(Input::get('eligible')==1 && Input::get('consent')==1 && Input::get('enroll_status')==1){
                     $check=$override->getNews('visit','visit_code','V4','client_id', Input::get('cid'))[0];
-                    if($check){
+                    if(!$check){
                         $user->visit(Input::get('cid'), Input::get('seq'));
                     }
                     $successMessage = 'Visit Successful Enrolled';
