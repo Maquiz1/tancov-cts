@@ -777,7 +777,7 @@ if ($user->isLoggedIn()) {
                                 $clients=$override->getWithLimit('clients', 'status', 1,$page,$numRec);
                             }else {
                                 $pagNum=0;
-                                $pagNum=$override->countData('clients','status',1,'site_id',$user->data()->site_id,);
+                                $pagNum=$override->countData('clients','status',1,'site_id',$user->data()->site_id);
                                 $pages = ceil($pagNum / $numRec);if(!$_GET['page'] || $_GET['page'] == 1){$page = 0;}else{$page = ($_GET['page']*$numRec)-$numRec;}
                                 $clients=$override->getWithLimit1('clients','site_id',$user->data()->site_id, 'status',1,$page,$numRec);
                             }?>
@@ -1279,23 +1279,42 @@ if ($user->isLoggedIn()) {
                                             <thead>
                                             <tr>
                                                 <th width="5%">#</th>
-                                                <th width="15%">Visit Name</th>
-                                                <th width="15%">Visit Code</th>
-                                                <th width="15%">Visit Type</th>
-                                                <th width="15%">Visit Date</th>
+                                                <th width="10%">Visit Name</th>
+                                                <th width="5%">Visit Code</th>
+                                                <th width="10%">Visit Type</th>
+                                                <th width="10%">Visit Date(Lower Limit)</th>
+                                                <th width="10%">Visit Date(Exact)</th>
+                                                <th width="10%">Visit Date(Upper Limit)</th>
+                                                <th width="10%">Missed Days</th>
                                                 <th width="10%">Status</th>
                                                 <th width="35%">Action</th>
                                             </tr>
                                             </thead>
                                             <tbody>
                                             <?php $x=1;foreach ($override->get('visit', 'client_id', $_GET['cid']) as $visit) {
+                                                $sch = $override->get('schedule','visit',$visit['visit_code'])[0];
+                                                if($sch){$schedule=$sch['window'];}else{$schedule=0;}
+                                                $lower=date('Y-m-d', strtotime($visit['visit_date']. ' - '.$schedule.' days'));
+                                                $upper=date('Y-m-d', strtotime($visit['visit_date']. ' + '.$schedule.' days'));
+                                                $msv=$user->dateDiff($upper,date('Y-m-d'));
                                                 if($visit['visit_code'] == 'V1' || $visit['visit_code'] == 'V2'){$v_typ='Screening';}elseif ($visit['visit_code'] == 'V3'){$v_typ='Enrollment';}else{$v_typ='Follow Up';}?>
                                                 <tr>
                                                     <td><?=$x?></td>
                                                     <td> <?=$visit['visit_name'] ?></td>
                                                     <td> <?=$visit['visit_code'] ?></td>
                                                     <td> <?=$v_typ ?></td>
-                                                    <td> <?= $visit['visit_date'] ?></td>
+                                                    <?php if($visit['visit_code'] == 'V1' || $visit['visit_code'] == 'V2' || $visit['visit_code'] == 'V3'){?>
+                                                        <td> <strong> - </strong> </td>
+                                                        <td> <strong style="color: darkgreen"><?=$visit['visit_date'] ?></strong></td>
+                                                        <td> <strong> - </strong></td>
+                                                        <td> <strong> - </strong></td>
+                                                    <?php }else{if($msv > 0){$dur=$msv;}else{$dur='-';}?>
+                                                        <td> <strong style="color: darkgreen"><?=$lower ?></strong> </td>
+                                                        <td> <strong style="color: coral"><?=$visit['visit_date'] ?></strong></td>
+                                                        <td> <strong style="color: darkred"><?=$upper ?></strong></td>
+                                                        <td> <strong><?=$dur ?></strong></td>
+                                                    <?php }?>
+
                                                     <?php if($visit['status'] == 1) {?>
                                                         <td>
                                                             <a href="#<?= $visit['id'] ?>" role="button" class="btn btn-success">Done</a>
@@ -1308,18 +1327,34 @@ if ($user->isLoggedIn()) {
                                                                 <a href="#addEnroll<?= $visit['id'] ?>" role="button" class="btn btn-info" data-toggle="modal">Add Enrollment</a>
                                                             <?php }?>
                                                         </td>
-                                                    <?php }elseif($visit['status'] == 0){?>
-                                                        <td><a href="#<?= $visit['id'] ?>" role="button" class="btn btn-warning">Pending</a></td>
-                                                        <td>
-                                                            <a href="#addVisit<?= $visit['id'] ?>" role="button" class="btn btn-info" data-toggle="modal">Add</a>
-                                                            <?php if($visit['seq_no'] > 3){?>
-                                                                <a href="#addUnscheduled<?= $visit['id'] ?>" role="button" class="btn btn-info" data-toggle="modal">Add Unscheduled</a>
-                                                            <?php }?>
-                                                            <?php if($visit['visit_code'] == 'V3'){?>
-                                                                <a href="#addEnroll<?= $visit['id'] ?>" role="button" class="btn btn-info" data-toggle="modal">Add Enrollment</a>
-                                                            <?php }?>
-                                                        </td>
-                                                    <?php }elseif ($visit['status'] == 2){?>
+                                                    <?php }
+                                                    elseif($visit['status'] == 0){
+                                                        if($msv > 0){?>
+                                                            <td><a href="#<?= $visit['id'] ?>" role="button" class="btn btn-danger"> Missed </a></td>
+                                                            <!-- if you want to allow user to enter visit even when its missed uncomment and remove last td tag-->
+<!--                                                            <td>-->
+<!--                                                                <a href="#addVisit--><?//= $visit['id'] ?><!--" role="button" class="btn btn-info" data-toggle="modal">Add</a>-->
+<!--                                                                --><?php //if($visit['seq_no'] > 3){?>
+<!--                                                                    <a href="#addUnscheduled--><?//= $visit['id'] ?><!--" role="button" class="btn btn-info" data-toggle="modal">Add Unscheduled</a>-->
+<!--                                                                --><?php //}?>
+<!--                                                                --><?php //if($visit['visit_code'] == 'V3'){?>
+<!--                                                                    <a href="#addEnroll--><?//= $visit['id'] ?><!--" role="button" class="btn btn-info" data-toggle="modal">Add Enrollment</a>-->
+<!--                                                                --><?php //}?>
+<!--                                                            </td>-->
+                                                            <td></td>
+                                                        <?php }else {?>
+                                                            <td><a href="#<?= $visit['id'] ?>" role="button" class="btn btn-warning">Pending</a></td>
+                                                            <td>
+                                                                <a href="#addVisit<?= $visit['id'] ?>" role="button" class="btn btn-info" data-toggle="modal">Add</a>
+                                                                <?php if($visit['seq_no'] > 3){?>
+                                                                    <a href="#addUnscheduled<?= $visit['id'] ?>" role="button" class="btn btn-info" data-toggle="modal">Add Unscheduled</a>
+                                                                <?php }?>
+                                                                <?php if($visit['visit_code'] == 'V3'){?>
+                                                                    <a href="#addEnroll<?= $visit['id'] ?>" role="button" class="btn btn-info" data-toggle="modal">Add Enrollment</a>
+                                                                <?php }?>
+                                                            </td>
+                                                        <?php }}
+                                                        elseif ($visit['status'] == 2){?>
                                                         <td>
                                                             <a href="#<?= $visit['id'] ?>" role="button" class="btn btn-warning">Not Done</a>
                                                             <?php if($visit['seq_no'] > 3){?>
