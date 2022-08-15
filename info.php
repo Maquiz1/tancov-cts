@@ -8,7 +8,7 @@ $random = new Random();
 $successMessage = null;
 $pageError = null;
 $errorMessage = null;
-$numRec=25;
+$numRec=15;
 if ($user->isLoggedIn()) {
     if (Input::exists('post')) {
         $validate = new validate();
@@ -771,9 +771,15 @@ if ($user->isLoggedIn()) {
                                 </ul>
                             </div>
                             <?php if($user->data()->power == 1){
-                                $clients=$override->get('clients', 'status', 1);
+                                $pagNum=0;
+                                $pagNum=$override->getCount('clients','status',1);
+                                $pages = ceil($pagNum / $numRec);if(!$_GET['page'] || $_GET['page'] == 1){$page = 0;}else{$page = ($_GET['page']*$numRec)-$numRec;}
+                                $clients=$override->getWithLimit('clients', 'status', 1,$page,$numRec);
                             }else {
-                                $clients=$override->getNews('clients','site_id',$user->data()->site_id, 'status',1);
+                                $pagNum=0;
+                                $pagNum=$override->countData('clients','status',1,'site_id',$user->data()->site_id,);
+                                $pages = ceil($pagNum / $numRec);if(!$_GET['page'] || $_GET['page'] == 1){$page = 0;}else{$page = ($_GET['page']*$numRec)-$numRec;}
+                                $clients=$override->getWithLimit1('clients','site_id',$user->data()->site_id, 'status',1,$page,$numRec);
                             }?>
                             <div class="block-fluid">
                                 <table cellpadding="0" cellspacing="0" width="100%" class="table">
@@ -790,7 +796,9 @@ if ($user->isLoggedIn()) {
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <?php $x=1;foreach ($clients as $client) {?>
+                                    <?php
+                                    $amnt = 0;
+                                    $x=1;foreach ($clients as $client) {?>
                                         <tr>
                                             <td><input type="checkbox" name="checkbox" /></td>
                                             <td><?=$x?></td>
@@ -1222,6 +1230,15 @@ if ($user->isLoggedIn()) {
                                     <?php $x++;} ?>
                                     </tbody>
                                 </table>
+                            </div>
+                            <div class="pull-right">
+                                <div class="btn-group">
+                                    <a href="info.php?id=3&page=<?php if(($_GET['page']-1) > 0){echo $_GET['page']-1;}else{echo 1;}?>" class="btn btn-default"> < </a>
+                                    <?php for($i=1;$i<=$pages;$i++){?>
+                                        <a href="info.php?id=3&page=<?=$_GET['id']?>&page=<?=$i?>" class="btn btn-default <?php if($i == $_GET['page']){echo 'active';}?>"><?=$i?></a>
+                                    <?php } ?>
+                                    <a href="info.php?id=3&page=<?php if(($_GET['page']+1) <= $pages){echo $_GET['page']+1;}else{echo $i-1;}?>" class="btn btn-default"> > </a>
+                                </div>
                             </div>
                         </div>
                     <?php } elseif ($_GET['id'] == 4) { ?>
