@@ -322,6 +322,73 @@ if ($user->isLoggedIn()) {
                 $pageError = $validate->errors();
             }
         }
+        elseif (Input::get('edit_pre_screening')) {
+            $validate = new validate();
+            $validate = $validate->check($_POST, array(
+                'firstname' => array(
+                    'required' => true,
+                ),
+                'lastname' => array(
+                    'required' => true,
+                ),
+                'contact' => array(
+                    'required' => true,
+                ),
+                'test_date' => array(
+                    'required' => true,
+                ),
+                'rapid_test_result' => array(
+                    'required' => true,
+                ),
+                'tested_by' => array(
+                    'required' => true,
+                ),
+                'appointment_date' => array(
+                    'required' => true,
+                ),
+            ));
+            if ($validate->passed()) {
+                $errorM = false;
+                try {
+                    $user->updateRecord('pre_screening', array(
+                        'firstname' => Input::get('firstname'),
+                        'lastname' => Input::get('lastname'),
+                        'contact' => Input::get('contact'),
+                        'test_date' => Input::get('test_date'),
+                        'rapid_test_result' => Input::get('rapid_test_result'),
+                        'tested_by' => Input::get('tested_by'),
+                        'appointment_date' => Input::get('appointment_date'),
+                        'staff_id' => $user->data()->id,
+                    ),Input::get('id'));
+                    $successMessage = 'Pre Screening Client Updated Successful';
+                } catch (Exception $e) {
+                    die($e->getMessage());
+                }
+            } else {
+                $pageError = $validate->errors();
+            }
+        }
+        elseif (Input::get('study_screened')) {
+            $validate = new validate();
+            $validate = $validate->check($_POST, array(
+                'screened' => array(
+                    'required' => true,
+                ),
+            ));
+            if ($validate->passed()) {
+                $errorM = false;
+                try {
+                    $user->updateRecord('pre_screening', array(
+                        'screened' => Input::get('screened'),
+                    ),Input::get('id'));
+                    $successMessage = 'Pre Screening Client Updated Successful';
+                } catch (Exception $e) {
+                    die($e->getMessage());
+                }
+            } else {
+                $pageError = $validate->errors();
+            }
+        }
     }
 } else {
     Redirect::to('index.php');
@@ -1369,7 +1436,7 @@ if ($user->isLoggedIn()) {
                                                 <div class="modal fade" id="addVisit<?= $visit['id'] ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                                                     <div class="modal-dialog">
                                                         <div class="modal-content">
-                                                            <form method="post">
+                                                            <form id="validation" method="post">
                                                                 <div class="modal-header">
                                                                     <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
                                                                     <h4>Add Visit</h4>
@@ -1434,7 +1501,7 @@ if ($user->isLoggedIn()) {
                                                 <div class="modal fade" id="addUnscheduled<?= $visit['id'] ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                                                     <div class="modal-dialog">
                                                         <div class="modal-content">
-                                                            <form method="post">
+                                                            <form id="validation" method="post">
                                                                 <div class="modal-header">
                                                                     <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
                                                                     <h4>Add Unscheduled Visit</h4>
@@ -1497,7 +1564,7 @@ if ($user->isLoggedIn()) {
                                                 <div class="modal fade" id="addEnroll<?= $visit['id'] ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                                                     <div class="modal-dialog">
                                                         <div class="modal-content">
-                                                            <form method="post">
+                                                            <form id="validation" method="post">
                                                                 <div class="modal-header">
                                                                     <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
                                                                     <h4>Add Enrollment Visit</h4>
@@ -1630,7 +1697,278 @@ if ($user->isLoggedIn()) {
                             </div>
                         </div>
                     <?php } elseif ($_GET['id'] == 6) { ?>
+                        <div class="col-md-12">
+                            <div class="head clearfix">
+                                <div class="isw-grid"></div>
+                                <h1>List of Pre Screened Clients</h1>
+                                <ul class="buttons">
+                                    <li><a href="#" class="isw-download"></a></li>
+                                    <li><a href="#" class="isw-attachment"></a></li>
+                                    <li>
+                                        <a href="#" class="isw-settings"></a>
+                                        <ul class="dd-list">
+                                            <li><a href="#"><span class="isw-plus"></span> New document</a></li>
+                                            <li><a href="#"><span class="isw-edit"></span> Edit</a></li>
+                                            <li><a href="#"><span class="isw-delete"></span> Delete</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                            <?php if($user->data()->power == 1){
+                                $pagNum=0;
+                                $pagNum=$override->getCount('pre_screening','status',1);
+                                $pages = ceil($pagNum / $numRec);if(!$_GET['page'] || $_GET['page'] == 1){$page = 0;}else{$page = ($_GET['page']*$numRec)-$numRec;}
+                                $clients=$override->getWithLimit('pre_screening', 'status', 1,$page,$numRec);
+                            }else {
+                                $pagNum=0;
+                                $pagNum=$override->countData('pre_screening','status',1,'site_id',$user->data()->site_id);
+                                $pages = ceil($pagNum / $numRec);if(!$_GET['page'] || $_GET['page'] == 1){$page = 0;}else{$page = ($_GET['page']*$numRec)-$numRec;}
+                                $clients=$override->getWithLimit1('pre_screening','site_id',$user->data()->site_id, 'status',1,$page,$numRec);
+                            }?>
+                            <div class="block-fluid">
+                                <table cellpadding="0" cellspacing="0" width="100%" class="table">
+                                    <thead>
+                                    <tr>
+                                        <th><input type="checkbox" name="checkall" /></th>
+                                        <td width="5">#</td>
+                                        <th width="10%">Name</th>
+                                        <th width="10%">Contact</th>
+                                        <th width="10%">Test date</th>
+                                        <th width="10%">Rapid Ab Test Results</th>
+                                        <th width="10%">Tested By</th>
+                                        <th width="10%">Appointment Date</th>
+                                        <th width="10%">Status</th>
+                                        <th width="10%">Study Screened</th>
+                                        <th width="20%">Action</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <?php
+                                    $amnt = 0;
+                                    $x=1;foreach ($clients as $client) {?>
+                                        <tr>
+                                            <td><input type="checkbox" name="checkbox" /></td>
+                                            <td><?=$x?></td>
+                                            <td> <?=$client['firstname'] . ' ' . $client['lastname'] ?></td>
+                                            <td><?=$client['contact'] ?></td>
+                                            <td><?=$client['test_date'] ?></td>
+                                            <td><?=$client['rapid_test_result'] ?></td>
+                                            <td><?=$client['tested_by'] ?></td>
+                                            <td><?=$client['appointment_date'] ?></td>
+                                            <td>
+                                                <?php if($client['rapid_test_result'] == '1'){?>
+                                                    <a href="#" role="button" class="btn btn-success">Eligible</a>
+                                                <?php }else{?>
+                                                    <a href="#" role="button" class="btn btn-danger">Ineligible</a>
+                                                <?php }?>
+                                            </td>
+                                            <td>
+                                                <?php if($client['screened'] == 1){?>
+                                                    <a href="#" role="button" class="btn btn-success">Done</a>
+                                                <?php }elseif ($client['screened'] == 0){?>
+                                                    <a href="#" role="button" class="btn btn-warning">Pending</a>
+                                                <?php }else{?>
+                                                    <a href="#" role="button" class="btn btn-danger">Ineligible</a>
+                                                <?php }?>
+                                            </td>
+                                            <td>
+                                                <a href="#PclientView<?= $client['id'] ?>" role="button" class="btn btn-default" data-toggle="modal">View</a>
+                                                <a href="#Pclient<?= $client['id'] ?>" role="button" class="btn btn-info" data-toggle="modal">Edit</a>
+                                                <a href="#sScreened<?= $client['id'] ?>" role="button" class="btn btn-default" data-toggle="modal">Study Screened</a>
+                                            </td>
 
+                                        </tr>
+                                        <div class="modal fade" id="PclientView<?= $client['id'] ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <form method="post">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                                            <h4>View Client Pre Screening Info</h4>
+                                                        </div>
+                                                        <div class="modal-body modal-body-np">
+                                                            <div class="row">
+                                                                <div class="block-fluid">
+                                                                    <div class="row-form clearfix">
+                                                                        <div class="col-md-3">First Name:</div>
+                                                                        <div class="col-md-9">
+                                                                            <input value="<?=$client['firstname']?>" class="validate[required]" type="text" name="firstname" id="firstname" disabled/>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row-form clearfix">
+                                                                        <div class="col-md-3">Last Name:</div>
+                                                                        <div class="col-md-9">
+                                                                            <input value="<?=$client['lastname']?>" class="validate[required]" type="text" name="lastname" id="lastname" disabled/>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="row-form clearfix">
+                                                                        <div class="col-md-3">Contact Number:</div>
+                                                                        <div class="col-md-9"><input value="<?=$client['contact']?>" class="" type="text" name="contact" id="contact" disabled /> <span>Example: 0700 000 111</span></div>
+                                                                    </div>
+
+                                                                    <div class="row-form clearfix">
+                                                                        <div class="col-md-3">Test Date:</div>
+                                                                        <div class="col-md-9">
+                                                                            <input value="<?=$client['test_date']?>" class="validate[required,custom[date]]" type="text" name="test_date" id="test_date" disabled/> <span>Example: 2010-12-01</span>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="row-form clearfix">
+                                                                        <div class="col-md-3">Rapid Ab test results</div>
+                                                                        <div class="col-md-9">
+                                                                            <select name="rapid_test_result" style="width: 100%;" disabled>
+                                                                                <option value="<?=$client['rapid_test_result']?>"><?php if($client['rapid_test_result'] == 1){echo 'None Reactive';}else{echo 'Reactive';}?></option>
+                                                                                <option value="1">None Reactive</option>
+                                                                                <option value="2">Reactive</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="row-form clearfix">
+                                                                        <div class="col-md-3">Tested by(name):</div>
+                                                                        <div class="col-md-9">
+                                                                            <input value="<?=$client['tested_by']?>" type="text" name="tested_by" id="tested_by" disabled/>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="row-form clearfix">
+                                                                        <div class="col-md-3">Appointment date:</div>
+                                                                        <div class="col-md-9">
+                                                                            <input value="<?=$client['appointment_date']?>" class="validate[required,custom[date]]" type="text" name="appointment_date" id="appointment_date" disabled/> <span>Example: 2010-12-01</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="dr"><span></span></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <input type="hidden" name="id" value="<?= $client['id'] ?>">
+                                                            <button class="btn btn-default" data-dismiss="modal" aria-hidden="true">Close</button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                        <div class="modal fade" id="Pclient<?= $client['id'] ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <form id="validation" enctype="multipart/form-data" method="post">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                                            <h4>Edit Client Pre Screening Info</h4>
+                                                        </div>
+                                                        <div class="modal-body modal-body-np">
+                                                            <div class="row">
+                                                                <div class="block-fluid">
+                                                                    <div class="row-form clearfix">
+                                                                        <div class="col-md-3">First Name:</div>
+                                                                        <div class="col-md-9">
+                                                                            <input value="<?=$client['firstname']?>" class="validate[required]" type="text" name="firstname" id="firstname" />
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row-form clearfix">
+                                                                        <div class="col-md-3">Last Name:</div>
+                                                                        <div class="col-md-9">
+                                                                            <input value="<?=$client['lastname']?>" class="validate[required]" type="text" name="lastname" id="lastname" />
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="row-form clearfix">
+                                                                        <div class="col-md-3">Contact Number:</div>
+                                                                        <div class="col-md-9"><input value="<?=$client['contact']?>" class="" type="text" name="contact" id="contact" required /> <span>Example: 0700 000 111</span></div>
+                                                                    </div>
+
+                                                                    <div class="row-form clearfix">
+                                                                        <div class="col-md-3">Test Date:</div>
+                                                                        <div class="col-md-9">
+                                                                            <input value="<?=$client['test_date']?>" class="validate[required,custom[date]]" type="text" name="test_date" id="test_date"/> <span>Example: 2010-12-01</span>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="row-form clearfix">
+                                                                        <div class="col-md-3">Rapid Ab test results</div>
+                                                                        <div class="col-md-9">
+                                                                            <select name="rapid_test_result" style="width: 100%;" required>
+                                                                                <option value="<?=$client['rapid_test_result']?>"><?php if($client['rapid_test_result'] == 1){echo 'None Reactive';}else{echo 'Reactive';}?></option>
+                                                                                <option value="1">None Reactive</option>
+                                                                                <option value="2">Reactive</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="row-form clearfix">
+                                                                        <div class="col-md-3">Tested by(name):</div>
+                                                                        <div class="col-md-9">
+                                                                            <input value="<?=$client['tested_by']?>" type="text" name="tested_by" id="tested_by" />
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="row-form clearfix">
+                                                                        <div class="col-md-3">Appointment date:</div>
+                                                                        <div class="col-md-9">
+                                                                            <input value="<?=$client['appointment_date']?>" class="validate[required,custom[date]]" type="text" name="appointment_date" id="appointment_date"/> <span>Example: 2010-12-01</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="dr"><span></span></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <input type="hidden" name="id" value="<?=$client['id'] ?>">
+                                                            <input type="submit" name="edit_pre_screening" value="Save updates" class="btn btn-warning">
+                                                            <button class="btn btn-default" data-dismiss="modal" aria-hidden="true">Close</button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                        <div class="modal fade" id="sScreened<?=$client['id'] ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <form method="post">
+                                                        <div class="modal-header">
+                                                            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                                            <h4>Screened for the Study</h4>
+                                                        </div>
+                                                        <div class="modal-body modal-body-np">
+                                                            <div class="row">
+                                                                <div class="row-form clearfix">
+                                                                    <div class="col-md-6">Is Client Screened for the study</div>
+                                                                    <div class="col-md-4">
+                                                                        <select name="screened" style="width: 100%;" required>
+                                                                            <option value="<?=$client['screened'] ?>"><?php if($client['screened']){echo $client['screened'];}else{echo 'Select';}?></option>
+                                                                            <option value="1">Yes</option>
+                                                                            <option value="2">No</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="dr"><span></span></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <input type="hidden" name="id" value="<?= $client['id'] ?>">
+                                                            <input type="submit" name="study_screened" class="btn btn-warning" value="Save updates">
+                                                            <button class="btn btn-default" data-dismiss="modal" aria-hidden="true">Close</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <?php $x++;} ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="pull-right">
+                                <div class="btn-group">
+                                    <a href="info.php?id=3&page=<?php if(($_GET['page']-1) > 0){echo $_GET['page']-1;}else{echo 1;}?>" class="btn btn-default"> < </a>
+                                    <?php for($i=1;$i<=$pages;$i++){?>
+                                        <a href="info.php?id=3&page=<?=$_GET['id']?>&page=<?=$i?>" class="btn btn-default <?php if($i == $_GET['page']){echo 'active';}?>"><?=$i?></a>
+                                    <?php } ?>
+                                    <a href="info.php?id=3&page=<?php if(($_GET['page']+1) <= $pages){echo $_GET['page']+1;}else{echo $i-1;}?>" class="btn btn-default"> > </a>
+                                </div>
+                            </div>
+                        </div>
                     <?php } elseif ($_GET['id'] == 7) { ?>
 
                     <?php } ?>

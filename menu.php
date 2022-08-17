@@ -49,6 +49,21 @@ if ($user->data()->accessLevel == 1) {
                 </ul>
             </li>
             <li class="openable">
+                <a href="#"><span class="isw-user"></span><span class="text">Pre Screening</span></a>
+                <ul>
+                    <li>
+                        <a href="add.php?id=8">
+                            <span class="glyphicon glyphicon-user"></span><span class="text">Add pre-screening</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="info.php?id=6">
+                            <span class="glyphicon glyphicon-registration-mark"></span><span class="text">Pre-screening List</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="openable">
                 <a href="#"><span class="isw-users"></span><span class="text">Clients</span></a>
                 <ul>
                     <li>
@@ -114,6 +129,21 @@ if ($user->data()->accessLevel == 1) {
                 </ul>
             </li>
         <?php } else { ?>
+            <li class="openable">
+                <a href="#"><span class="isw-user"></span><span class="text">Pre Screening</span></a>
+                <ul>
+                    <li>
+                        <a href="add.php?id=8">
+                            <span class="glyphicon glyphicon-user"></span><span class="text">Add pre-screening</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="info.php?id=6">
+                            <span class="glyphicon glyphicon-registration-mark"></span><span class="text">Pre-screening List</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
             <li class="openable">
                 <a href="#"><span class="isw-users"></span><span class="text">Clients</span></a>
                 <ul>

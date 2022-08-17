@@ -240,6 +240,55 @@ if ($user->isLoggedIn()) {
                 $pageError = $validate->errors();
             }
         }
+        elseif (Input::get('add_pre_screening')) {
+            $validate = new validate();
+            $validate = $validate->check($_POST, array(
+                'firstname' => array(
+                    'required' => true,
+                ),
+                'lastname' => array(
+                    'required' => true,
+                ),
+                'contact' => array(
+                    'required' => true,
+                ),
+                'test_date' => array(
+                    'required' => true,
+                ),
+                'rapid_test_result' => array(
+                    'required' => true,
+                ),
+                'tested_by' => array(
+                    'required' => true,
+                ),
+                'appointment_date' => array(
+                    'required' => true,
+                ),
+            ));
+            if ($validate->passed()) {
+                $errorM = false;
+                try {
+                    $user->createRecord('pre_screening', array(
+                        'firstname' => Input::get('firstname'),
+                        'lastname' => Input::get('lastname'),
+                        'contact' => Input::get('contact'),
+                        'test_date' => Input::get('test_date'),
+                        'rapid_test_result' => Input::get('rapid_test_result'),
+                        'tested_by' => Input::get('tested_by'),
+                        'appointment_date' => Input::get('appointment_date'),
+                        'created_on' => date('Y-m-d'),
+                        'site_id' => $user->data()->site_id,
+                        'staff_id' => $user->data()->id,
+                        'status' => 1,
+                    ));
+                    $successMessage = 'Pre Screening Client Added Successful';
+                } catch (Exception $e) {
+                    die($e->getMessage());
+                }
+            } else {
+                $pageError = $validate->errors();
+            }
+        }
     }
 } else {
     Redirect::to('index.php');
@@ -461,7 +510,7 @@ if ($user->isLoggedIn()) {
                                 <h1>Add Client</h1>
                             </div>
                             <div class="block-fluid">
-                                <form enctype="multipart/form-data" method="post">
+                                <form id="validation" enctype="multipart/form-data" method="post">
 
                                     <div class="row-form clearfix">
                                         <div class="col-md-3">Study</div>
@@ -724,7 +773,71 @@ if ($user->isLoggedIn()) {
 
                         </div>
                     <?php } elseif ($_GET['id'] == 8) { ?>
+                        <div class="col-md-offset-1 col-md-8">
+                            <div class="head clearfix">
+                                <div class="isw-ok"></div>
+                                <h1>Add Pre Screening Client</h1>
+                            </div>
+                            <div class="block-fluid">
+                                <form id="validation" enctype="multipart/form-data" method="post">
+                                    <div class="row-form clearfix">
+                                        <div class="col-md-3">First Name:</div>
+                                        <div class="col-md-9">
+                                            <input value="" class="validate[required]" type="text" name="firstname" id="firstname" />
+                                        </div>
+                                    </div>
+                                    <div class="row-form clearfix">
+                                        <div class="col-md-3">Last Name:</div>
+                                        <div class="col-md-9">
+                                            <input value="" class="validate[required]" type="text" name="lastname" id="lastname" />
+                                        </div>
+                                    </div>
 
+                                    <div class="row-form clearfix">
+                                        <div class="col-md-3">Contact Number:</div>
+                                        <div class="col-md-9"><input value="" class="" type="text" name="contact" id="contact" required /> <span>Example: 0700 000 111</span></div>
+                                    </div>
+
+                                    <div class="row-form clearfix">
+                                        <div class="col-md-3">Test Date:</div>
+                                        <div class="col-md-9">
+                                            <input value="" class="validate[required,custom[date]]" type="text" name="test_date" id="test_date"/> <span>Example: 2010-12-01</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row-form clearfix">
+                                        <div class="col-md-3">Rapid Ab test results</div>
+                                        <div class="col-md-9">
+                                            <select name="rapid_test_result" style="width: 100%;" required>
+                                                <option value="">Select</option>
+                                                <option value="1">None Reactive</option>
+                                                <option value="2">Reactive</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="row-form clearfix">
+                                        <div class="col-md-3">Tested by(name):</div>
+                                        <div class="col-md-9">
+                                            <input value="" type="text" name="tested_by" id="tested_by" />
+                                        </div>
+                                    </div>
+
+                                    <div class="row-form clearfix">
+                                        <div class="col-md-3">Appointment date:</div>
+                                        <div class="col-md-9">
+                                            <input value="" class="validate[required,custom[date]]" type="text" name="appointment_date" id="appointment_date"/> <span>Example: 2010-12-01</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="footer tar">
+                                        <input type="submit" name="add_pre_screening" value="Submit" class="btn btn-default">
+                                    </div>
+
+                                </form>
+                            </div>
+
+                        </div>
                     <?php } elseif ($_GET['id'] == 9) { ?>
 
                     <?php } elseif ($_GET['id'] == 10) { ?>
