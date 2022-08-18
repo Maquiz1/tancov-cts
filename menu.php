@@ -79,11 +79,42 @@ if ($user->data()->accessLevel == 1) {
                 </ul>
             </li>
 
-<!--            <li class="active">-->
-<!--                <a href="printer.php">-->
-<!--                    <span class="isw-print"></span><span class="text">Print Barcode</span>-->
-<!--                </a>-->
-<!--            </li>-->
+            <li class="openable">
+                <a href="#"><span class="isw-documents"></span><span class="text">Reports</span></a>
+                <ul>
+                    <li>
+                        <a href="#">
+                            <span class="glyphicon glyphicon-list"></span><span class="text">Screening Reports</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <span class="glyphicon glyphicon-list"></span><span class="text">Pre Screening Reports</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <span class="glyphicon glyphicon-list"></span><span class="text">Enrollment Report</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <span class="glyphicon glyphicon-list"></span><span class="text">Daily Report</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <span class="glyphicon glyphicon-list"></span><span class="text">Visit Report</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <span class="glyphicon glyphicon-list"></span><span class="text">Visit Schedule</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <li class="active">
                 <a href="zebra.php" target="_blank">
                     <span class="isw-print"></span><span class="text">Zebra Print</span>
