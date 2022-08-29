@@ -119,5 +119,10 @@ class OverideData{
         $result = $query->fetchAll(PDO::FETCH_ASSOC);
         return $result;
     }
+    function tableHeader($table){
+        $query = $this->_pdo->query("DESCRIBE $table");
+        $result = $query->fetchAll(PDO::FETCH_COLUMN);
+        return $result;
+    }
 
 }
