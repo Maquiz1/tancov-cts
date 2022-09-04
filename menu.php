@@ -83,35 +83,40 @@ if ($user->data()->accessLevel == 1) {
                 <a href="#"><span class="isw-documents"></span><span class="text">Reports</span></a>
                 <ul>
                     <li>
-                        <a href="#">
-                            <span class="glyphicon glyphicon-list"></span><span class="text">Screening Reports</span>
+                        <a href="report.php?id=1">
+                            <span class="glyphicon glyphicon-search"></span><span class="text">Search Reports</span>
                         </a>
                     </li>
-                    <li>
-                        <a href="#">
-                            <span class="glyphicon glyphicon-list"></span><span class="text">Pre Screening Reports</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <span class="glyphicon glyphicon-list"></span><span class="text">Enrollment Report</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <span class="glyphicon glyphicon-list"></span><span class="text">Daily Report</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <span class="glyphicon glyphicon-list"></span><span class="text">Visit Report</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <span class="glyphicon glyphicon-list"></span><span class="text">Visit Schedule</span>
-                        </a>
-                    </li>
+<!--                    <li>-->
+<!--                        <a href="#">-->
+<!--                            <span class="glyphicon glyphicon-list"></span><span class="text">Screening Reports</span>-->
+<!--                        </a>-->
+<!--                    </li>-->
+<!--                    <li>-->
+<!--                        <a href="#">-->
+<!--                            <span class="glyphicon glyphicon-list"></span><span class="text">Pre Screening Reports</span>-->
+<!--                        </a>-->
+<!--                    </li>-->
+<!--                    <li>-->
+<!--                        <a href="#">-->
+<!--                            <span class="glyphicon glyphicon-list"></span><span class="text">Enrollment Report</span>-->
+<!--                        </a>-->
+<!--                    </li>-->
+<!--                    <li>-->
+<!--                        <a href="#">-->
+<!--                            <span class="glyphicon glyphicon-list"></span><span class="text">Daily Report</span>-->
+<!--                        </a>-->
+<!--                    </li>-->
+<!--                    <li>-->
+<!--                        <a href="#">-->
+<!--                            <span class="glyphicon glyphicon-list"></span><span class="text">Visit Report</span>-->
+<!--                        </a>-->
+<!--                    </li>-->
+<!--                    <li>-->
+<!--                        <a href="#">-->
+<!--                            <span class="glyphicon glyphicon-list"></span><span class="text">Visit Schedule</span>-->
+<!--                        </a>-->
+<!--                    </li>-->
                 </ul>
             </li>
 

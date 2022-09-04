@@ -305,13 +305,18 @@ if ($user->isLoggedIn()) {
         }
         elseif (Input::get('add_enroll')){
             $validate = $validate->check($_POST, array(
-
+                'enrolled_date' => array(
+                    'required' => true,
+                ),
+                'consent_date' => array(
+                    'required' => true,
+                ),
             ));
             if ($validate->passed()) {
                 if(Input::get('eligible')==1 && Input::get('consent')==1 && Input::get('enroll_status')==1){
                     $check=$override->getNews('visit','visit_code','V4','client_id', Input::get('cid'))[0];
                     if(!$check){
-                        $user->updateRecord('clients', array("enrolled"=>1),Input::get('cid'));
+                        $user->updateRecord('clients', array('enrolled'=>1,'enrolled_date'=>Input::get('enrolled_date'),'consent_date'=>Input::get('consent_date'),'reasons'=>Input::get('reasons')),Input::get('cid'));
                         $user->visit(Input::get('cid'), Input::get('seq'));
                     }
                     $successMessage = 'Visit Successful Enrolled';
@@ -1602,15 +1607,21 @@ if ($user->isLoggedIn()) {
                                                                             </div>
                                                                         </div>
                                                                         <div class="row-form clearfix">
+                                                                            <div class="col-md-3">Consent Date:</div>
+                                                                            <div class="col-md-9">
+                                                                                <input value="" class="validate[required,custom[date]]" type="text" name="consent_date" id="visit_date" required/> <span>Example: 2010-12-01</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="row-form clearfix">
                                                                             <div class="col-md-3">Reasons:</div>
                                                                             <div class="col-md-9">
                                                                                 <textarea name="reasons" rows="4" ></textarea>
                                                                             </div>
                                                                         </div>
                                                                         <div class="row-form clearfix">
-                                                                            <div class="col-md-3">Date:</div>
+                                                                            <div class="col-md-3">Enrollment Date:</div>
                                                                             <div class="col-md-9">
-                                                                                <input value="" class="validate[required,custom[date]]" type="text" name="visit_date" id="visit_date"/> <span>Example: 2010-12-01</span>
+                                                                                <input value="" class="validate[required,custom[date]]" type="text" name="enrolled_date" id="visit_date" required/> <span>Example: 2010-12-01</span>
                                                                             </div>
                                                                         </div>
                                                                         <div class="dr"><span></span></div>
