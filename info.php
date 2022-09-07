@@ -260,6 +260,12 @@ if ($user->isLoggedIn()) {
                         'visit_status' => Input::get('visit_status'),
                     ), Input::get('id'));
 
+                    if(Input::get('visit_status') == 8){
+                        $user->updateRecord('clients',array('withdraw_consent'=>1,'withdraw_consent_date'=>Input::get('visit_date')),Input::get('cid'));
+                    }elseif (Input::get('visit_status') == 9){
+                        $user->updateRecord('clients',array('screened_out'=>1,'screened_out_date' =>Input::get('visit_date')),Input::get('cid'));
+                    }
+
                     if(Input::get('seq') == 2){
                         $user->createRecord('visit', array(
                             'visit_name' => 'Visit 3',
@@ -1364,6 +1370,7 @@ if ($user->isLoggedIn()) {
                                             </thead>
                                             <tbody>
                                             <?php $x=1;foreach ($override->get('visit', 'client_id', $_GET['cid']) as $visit) {
+//                                                ****************** fix unscheduled visit button showing up
                                                 $sch = $override->get('schedule','visit',$visit['visit_code'])[0];
                                                 if($sch){$schedule=$sch['window'];}else{$schedule=0;}
                                                 $lower=date('Y-m-d', strtotime($visit['visit_date']. ' - '.$schedule.' days'));
@@ -1472,6 +1479,8 @@ if ($user->isLoggedIn()) {
                                                                                     <option value="5">Follow Up Visit</option>
                                                                                     <option value="6">Early Termination</option>
                                                                                     <option value="7">Termination</option>
+                                                                                    <option value="8">Withdraw Consent</option>
+                                                                                    <option value="9">Screened Out</option>
                                                                                 </select>
                                                                             </div>
                                                                         </div>
@@ -1485,7 +1494,7 @@ if ($user->isLoggedIn()) {
                                                                         <div class="row-form clearfix">
                                                                             <div class="col-md-3">Date:</div>
                                                                             <div class="col-md-9">
-                                                                                <input value="<?=$visit['visit_date']?>" class="validate[required,custom[date]]" type="text" name="visit_date" id="visit_date"/> <span>Example: 2010-12-01</span>
+                                                                                <input value="" class="validate[required,custom[date]]" type="text" name="visit_date" id="visit_date" required/> <span>Example: 2010-12-01</span>
                                                                             </div>
                                                                         </div>
                                                                         <div class="dr"><span></span></div>
