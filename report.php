@@ -158,7 +158,7 @@ if ($user->isLoggedIn()) {
                                 <?php foreach ($clients as $client){?>
                                     <tr>
                                         <td><?=$client['participant_id']?></td>
-                                        <td><?=strtoupper(mb_substr($client['firstname'], 0, 1).mb_substr($client['lastname'], 0, 1))?></td>
+                                        <td><?=mb_substr($client['firstname'], 0, 1).mb_substr($client['lastname'], 0, 1)?></td>
                                         <td><?=strtoupper(mb_substr($client['gender'], 0, 1))?></td>
                                         <td><?=$client['consent_date']?></td>
                                         <td><?php if($client['enrolled'] == 1){echo 'YES';}else{echo 'NO';}?></td>
