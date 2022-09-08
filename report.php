@@ -137,9 +137,15 @@ if ($user->isLoggedIn()) {
                         </div>
                         <div class="block-fluid">
                             <?php if($user->data()->power == 1){
-                                $clients=$override->get('clients', 'status', 1);
+                                $pagNum=0;
+                                $pagNum=$override->getCount('clients','status',1);
+                                $pages = ceil($pagNum / $numRec);if(!$_GET['page'] || $_GET['page'] == 1){$page = 0;}else{$page = ($_GET['page']*$numRec)-$numRec;}
+                                $clients=$override->getWithLimit('clients', 'status', 1,$page,$numRec);
                             }else{
-                                $clients=$override->getNews('clients', 'site_id',$user->data()->site_id, 'status',1);
+                                $pagNum=0;
+                                $pagNum=$override->getCount('clients','status',1);
+                                $pages = ceil($pagNum / $numRec);if(!$_GET['page'] || $_GET['page'] == 1){$page = 0;}else{$page = ($_GET['page']*$numRec)-$numRec;}
+                                $clients=$override->getWithLimit1('clients','site_id',$user->data()->site_id, 'status',1,$page,$numRec);
                             }?>
                             <table cellpadding="0" cellspacing="0" width="100%" class="table">
                                 <thead>
@@ -169,6 +175,15 @@ if ($user->isLoggedIn()) {
                                 <?php }?>
                                 </tbody>
                             </table>
+                        </div>
+                        <div class="pull-right">
+                            <div class="btn-group">
+                                <a href="report.php?id=1&page=<?php if(($_GET['page']-1) > 0){echo $_GET['page']-1;}else{echo 1;}?>" class="btn btn-default"> < </a>
+                                <?php for($i=1;$i<=$pages;$i++){?>
+                                    <a href="report.php?id=1&page=<?=$_GET['id']?>&page=<?=$i?>" class="btn btn-default <?php if($i == $_GET['page']){echo 'active';}?>"><?=$i?></a>
+                                <?php } ?>
+                                <a href="report.php?id=1&page=<?php if(($_GET['page']+1) <= $pages){echo $_GET['page']+1;}else{echo $i-1;}?>" class="btn btn-default"> > </a>
+                            </div>
                         </div>
                     </div>
                 <?php } ?>
