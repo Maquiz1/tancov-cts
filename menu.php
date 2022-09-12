@@ -165,8 +165,6 @@ if ($user->data()->accessLevel == 1) {
                     </li>
                 </ul>
             </li>
-
-
             <li class="active">
                 <a href="zebra.php" target="_blank">
                     <span class="isw-print"></span><span class="text">Zebra Print</span>

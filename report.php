@@ -12,17 +12,18 @@ $numRec=15;
 if ($user->isLoggedIn()) {
     if (Input::exists('post')) {
         $validate = new validate();
-        if (Input::get('edit_position')) {
+        if (Input::get('search')) {
             $validate = $validate->check($_POST, array(
-                'name' => array(
+                'start_date' => array(
+                    'required' => true,
+                ),
+                'end_date' => array(
                     'required' => true,
                 ),
             ));
             if ($validate->passed()) {
                 try {
-                    $user->updateRecord('position', array(
-                        'name' => Input::get('name'),
-                    ), Input::get('id'));
+                    //do something
                     $successMessage = 'Position Successful Updated';
                 } catch (Exception $e) {
                     die($e->getMessage());
@@ -92,11 +93,11 @@ if ($user->isLoggedIn()) {
                                 <div class="row-form clearfix">
                                     <div class="col-md-1">Start Date:</div>
                                     <div class="col-md-2">
-                                        <input value="" class="validate[required,custom[date]]" type="text" name="start" id="name" /><span>Example: 2010-12-01</span>
+                                        <input value="" class="validate[required,custom[date]]" type="text" name="start_date" id="start_date" /><span>Example: 2010-12-01</span>
                                     </div>
                                     <div class="col-md-1">End Date:</div>
                                     <div class="col-md-2">
-                                        <input value="" class="validate[required,custom[date]]" type="text" name="end" id="name" /><span>Example: 2010-12-01</span>
+                                        <input value="" class="validate[required,custom[date]]" type="text" name="end_date" id="end_date" /><span>Example: 2010-12-01</span>
                                     </div>
                                     <div class="col-md-1">Type</div>
                                     <div class="col-md-2">
