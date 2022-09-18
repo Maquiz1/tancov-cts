@@ -400,6 +400,27 @@ if ($user->isLoggedIn()) {
                 $pageError = $validate->errors();
             }
         }
+
+        if($_GET['id'] == 7){
+            $data = null;
+            $filename = null;
+            if(Input::get('clients')){
+                $data = $override->getData('clients');
+                $filename = 'Clients';
+            }elseif (Input::get('visits')){
+                $data = $override->getData('visit');
+                $filename = 'Visits';
+            }
+            elseif (Input::get('pre_screening')){
+                $data = $override->getData('pre_screening');
+                $filename = 'Pre Screening';
+            }
+            elseif (Input::get('sites')){
+                $data = $override->getData('site');
+                $filename = 'Sites';
+            }
+            $user->exportData($data, $filename);
+        }
     }
 } else {
     Redirect::to('index.php');
@@ -1990,7 +2011,57 @@ if ($user->isLoggedIn()) {
                             </div>
                         </div>
                     <?php } elseif ($_GET['id'] == 7) { ?>
-
+                        <div class="col-md-6">
+                            <div class="head clearfix">
+                                <div class="isw-grid"></div>
+                                <h1>Download Data</h1>
+                                <ul class="buttons">
+                                    <li><a href="#" class="isw-download"></a></li>
+                                    <li><a href="#" class="isw-attachment"></a></li>
+                                    <li>
+                                        <a href="#" class="isw-settings"></a>
+                                        <ul class="dd-list">
+                                            <li><a href="#"><span class="isw-plus"></span> New document</a></li>
+                                            <li><a href="#"><span class="isw-edit"></span> Edit</a></li>
+                                            <li><a href="#"><span class="isw-delete"></span> Delete</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="block-fluid">
+                                <table cellpadding="0" cellspacing="0" width="100%" class="table">
+                                    <thead>
+                                    <tr>
+                                        <th width="5%">#</th>
+                                        <th width="25%">Name</th>
+                                        <th width="25%">Action</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>Clients</td>
+                                        <td><form method="post"><input type="submit" name="clients" value="Download"></form> </td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>Visit</td>
+                                        <td><form method="post"><input type="submit" name="visits" value="Download"></form> </td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td>Pre screening</td>
+                                        <td><form method="post"><input type="submit" name="pre_screening" value="Download"></form> </td>
+                                    </tr>
+                                    <tr>
+                                        <td>4</td>
+                                        <td>Sites</td>
+                                        <td><form method="post"><input type="submit" name="sites" value="Download"></form> </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     <?php } ?>
                 </div>
 

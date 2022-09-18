@@ -89,6 +89,11 @@ if ($user->data()->accessLevel == 1) {
                     </li>
                 </ul>
             </li>
+            <li class="">
+                <a href="info.php?id=7">
+                    <span class="isw-download"></span><span class="text">Download</span>
+                </a>
+            </li>
 
             <li class="active">
                 <a href="zebra.php" target="_blank">

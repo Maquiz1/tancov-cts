@@ -191,7 +191,7 @@ class User {
 
     function exportData($data,$file) {
         $timestamp = time();
-        $filename = $file.'_' . $timestamp . '.xls';
+        $filename = $file.'_' . $timestamp . '.xlsx';
 
         header("Content-Type: application/vnd.ms-excel");
         header("Content-Disposition: attachment; filename=\"$filename\"");
