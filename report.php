@@ -20,10 +20,20 @@ if ($user->isLoggedIn()) {
                 'end_date' => array(
                     'required' => true,
                 ),
+                'report' => array(
+                    'required' => true,
+                ),
             ));
             if ($validate->passed()) {
                 try {
-                    //do something
+                    switch (Input::get('report')){
+                        case 1:
+                            $data=$override->searchBtnDate2('clients','enrolled_date',Input::get('start_date'),'enrolled_date',Input::get('end_date'));
+                            break;
+                        case 2:
+                            $data=$override->searchBtnDate2('visit','visit_date',Input::get('start_date'),'visit_date',Input::get('end_date'));
+                            break;
+                    }
                     $successMessage = 'Position Successful Updated';
                 } catch (Exception $e) {
                     die($e->getMessage());
@@ -103,8 +113,8 @@ if ($user->isLoggedIn()) {
                                     <div class="col-md-2">
                                         <select name="report" style="width: 100%;" required>
                                             <option value="">Select Report</option>
-                                            <option value="1">Summary</option>
-                                            <option value="2">Log</option>
+                                            <option value="1">Enrollment</option>
+                                            <option value="2">Visit</option>
                                         </select>
                                     </div>
                                     <div class="col-md-2">
@@ -148,44 +158,100 @@ if ($user->isLoggedIn()) {
                                 $pages = ceil($pagNum / $numRec);if(!$_GET['page'] || $_GET['page'] == 1){$page = 0;}else{$page = ($_GET['page']*$numRec)-$numRec;}
                                 $clients=$override->getWithLimit1('clients','site_id',$user->data()->site_id, 'status',1,$page,$numRec);
                             }?>
-                            <table cellpadding="0" cellspacing="0" width="100%" class="table">
-                                <thead>
-                                <tr>
-                                    <th width="10%">Screening No</th>
-                                    <th width="10%">Initials</th>
-                                    <th width="10%">Sex</th>
-                                    <th width="10%">Consent Date</th>
-                                    <th width="10%">Enrolled</th>
-                                    <th width="10%">Enrollment Date</th>
-                                    <th width="10%">Enrollment No</th>
-                                    <th width="20%">Reason for Ineligibility</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <?php foreach ($clients as $client){?>
+                            <?php if($_POST && Input::get('report')==1){?>
+                                <table cellpadding="0" cellspacing="0" width="100%" class="table">
+                                    <thead>
                                     <tr>
-                                        <td><?=$client['participant_id']?></td>
-                                        <td><?=strtoupper(substr($client['firstname'], 0, 1).substr($client['lastname'], 0, 1))?></td>
-                                        <td><?=strtoupper(substr($client['gender'], 0, 1))?></td>
-                                        <td><?=$client['consent_date']?></td>
-                                        <td><?php if($client['enrolled'] == 1){echo 'YES';}else{echo 'NO';}?></td>
-                                        <td><?=$client['enrolled_date']?></td>
-                                        <td><?=$client['study_id']?></td>
-                                        <td></td>
+                                        <th width="10%">Screening No</th>
+                                        <th width="10%">Initials</th>
+                                        <th width="10%">Sex</th>
+                                        <th width="10%">Consent Date</th>
+                                        <th width="10%">Enrolled</th>
+                                        <th width="10%">Enrollment Date</th>
+                                        <th width="10%">Enrollment No</th>
                                     </tr>
-                                <?php }?>
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                    <?php foreach ($data as $client){?>
+                                        <tr>
+                                            <td><?=$client['participant_id']?></td>
+                                            <td><?=strtoupper(substr($client['firstname'], 0, 1).substr($client['lastname'], 0, 1))?></td>
+                                            <td><?=strtoupper(substr($client['gender'], 0, 1))?></td>
+                                            <td><?=$client['consent_date']?></td>
+                                            <td><?php if($client['enrolled'] == 1){echo 'YES';}else{echo 'NO';}?></td>
+                                            <td><?=$client['enrolled_date']?></td>
+                                            <td><?=$client['study_id']?></td>
+                                        </tr>
+                                    <?php }?>
+                                    </tbody>
+                                </table>
+                            <?php }elseif ($_POST && Input::get('report')==2){?>
+                                <table cellpadding="0" cellspacing="0" width="100%" class="table">
+                                    <thead>
+                                    <tr>
+                                        <th width="10%">Screening No</th>
+                                        <th width="10%">Initials</th>
+                                        <th width="10%">Sex</th>
+                                        <th width="10%">Visit Date</th>
+                                        <th width="10%">Status</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <?php foreach ($data as $visit){
+                                        $client=$override->get('clients','id', $visit['client_id'])[0]
+                                        ?>
+                                        <tr>
+                                            <td><?=$client['participant_id']?></td>
+                                            <td><?=strtoupper(substr($client['firstname'], 0, 1).substr($client['lastname'], 0, 1))?></td>
+                                            <td><?=strtoupper(substr($client['gender'], 0, 1))?></td>
+                                            <td><?=$visit['visit_date']?></td>
+                                            <td><?php if($visit['status'] == 1){echo 'Done';}else{echo 'Missed';}?></td>
+                                        </tr>
+                                    <?php }?>
+                                    </tbody>
+                                </table>
+                            <?php }else{?>
+                                <table cellpadding="0" cellspacing="0" width="100%" class="table">
+                                    <thead>
+                                    <tr>
+                                        <th width="10%">Screening No</th>
+                                        <th width="10%">Initials</th>
+                                        <th width="10%">Sex</th>
+                                        <th width="10%">Consent Date</th>
+                                        <th width="10%">Enrolled</th>
+                                        <th width="10%">Enrollment Date</th>
+                                        <th width="10%">Enrollment No</th>
+                                        <th width="20%">Reason for Ineligibility</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <?php foreach ($clients as $client){?>
+                                        <tr>
+                                            <td><?=$client['participant_id']?></td>
+                                            <td><?=strtoupper(substr($client['firstname'], 0, 1).substr($client['lastname'], 0, 1))?></td>
+                                            <td><?=strtoupper(substr($client['gender'], 0, 1))?></td>
+                                            <td><?=$client['consent_date']?></td>
+                                            <td><?php if($client['enrolled'] == 1){echo 'YES';}else{echo 'NO';}?></td>
+                                            <td><?=$client['enrolled_date']?></td>
+                                            <td><?=$client['study_id']?></td>
+                                            <td></td>
+                                        </tr>
+                                    <?php }?>
+                                    </tbody>
+                                </table>
+                            <?php }?>
                         </div>
-                        <div class="pull-right">
-                            <div class="btn-group">
-                                <a href="report.php?id=1&page=<?php if(($_GET['page']-1) > 0){echo $_GET['page']-1;}else{echo 1;}?>" class="btn btn-default"> < </a>
-                                <?php for($i=1;$i<=$pages;$i++){?>
-                                    <a href="report.php?id=1&page=<?=$_GET['id']?>&page=<?=$i?>" class="btn btn-default <?php if($i == $_GET['page']){echo 'active';}?>"><?=$i?></a>
-                                <?php } ?>
-                                <a href="report.php?id=1&page=<?php if(($_GET['page']+1) <= $pages){echo $_GET['page']+1;}else{echo $i-1;}?>" class="btn btn-default"> > </a>
+                        <?php if(!$_POST){?>
+                            <div class="pull-right">
+                                <div class="btn-group">
+                                    <a href="report.php?id=1&page=<?php if(($_GET['page']-1) > 0){echo $_GET['page']-1;}else{echo 1;}?>" class="btn btn-default"> < </a>
+                                    <?php for($i=1;$i<=$pages;$i++){?>
+                                        <a href="report.php?id=1&page=<?=$_GET['id']?>&page=<?=$i?>" class="btn btn-default <?php if($i == $_GET['page']){echo 'active';}?>"><?=$i?></a>
+                                    <?php } ?>
+                                    <a href="report.php?id=1&page=<?php if(($_GET['page']+1) <= $pages){echo $_GET['page']+1;}else{echo $i-1;}?>" class="btn btn-default"> > </a>
+                                </div>
                             </div>
-                        </div>
+                        <?php }?>
                     </div>
                 <?php } ?>
             </div>

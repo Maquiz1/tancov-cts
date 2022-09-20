@@ -82,6 +82,12 @@ class OverideData{
         return $result;
     }
 
+    public function searchBtnDate2($table,$var,$value,$var1,$value1){
+        $query = $this->_pdo->query("SELECT * FROM $table WHERE $var >= '$value' AND $var1 <= '$value1'");
+        $result = $query->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
     public function delete($table,$field,$value){
         return $this->_pdo->query("DELETE FROM $table WHERE $field = $value");
     }
