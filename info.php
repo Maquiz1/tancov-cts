@@ -49,8 +49,6 @@ if ($user->isLoggedIn()) {
                 'email_address' => array(),
             ));
             if ($validate->passed()) {
-                $salt = $random->get_rand_alphanumeric(32);
-                $password = '12345678';
                 switch (Input::get('position')) {
                     case 1:
                         $accessLevel = 1;
@@ -182,7 +180,7 @@ if ($user->isLoggedIn()) {
             ));
             if ($validate->passed()) {
                 try {
-                    $attachment_file = Input::get('image');
+//                    $attachment_file = Input::get('image');
                     if (!empty($_FILES['image']["tmp_name"])) {
                         $attach_file = $_FILES['image']['type'];
                         if ($attach_file == "image/jpeg" || $attach_file == "image/jpg" || $attach_file == "image/png" || $attach_file == "image/gif") {
@@ -201,12 +199,7 @@ if ($user->isLoggedIn()) {
                             $errorMessage = 'None supported file format';
                         }//not supported format
                     }else{
-                        $attachment_file = '';
-                    }
-                    if (!empty($_FILES['image']["tmp_name"])) {
-                        $image = $attachment_file;
-                    }else{
-                        $image = Input::get('client_image');
+                        $attachment_file = Input::get('client_image');
                     }
                     if($errorM == false){
                         $user->updateRecord('clients', array(
@@ -229,7 +222,7 @@ if ($user->isLoggedIn()) {
                             'street' => Input::get('street'),
                             'ward' => Input::get('ward'),
                             'block_no' => Input::get('block_no'),
-                            'client_image' => $image,
+                            'client_image' => $attachment_file,
                             'comments' => Input::get('comments'),
                         ), Input::get('id'));
 
@@ -911,7 +904,7 @@ if ($user->isLoggedIn()) {
                                             <td><?=$client['age'] ?></td>
                                             <td>
                                                 <a href="#clientView<?= $client['id'] ?>" role="button" class="btn btn-default" data-toggle="modal">View</a>
-                                                <a href="#client<?= $client['id'] ?>" role="button" class="btn btn-info" data-toggle="modal">Edit</a>
+                                                <a href="info.php?id=8&cid=<?= $client['id'] ?>" role="button" class="btn btn-info">Edit</a>
                                                 <a href="id.php?cid=<?= $client['id'] ?>"  class="btn btn-warning" >Patient ID</a>
                                                 <a href="#delete<?= $client['id'] ?>" role="button" class="btn btn-danger" data-toggle="modal">Delete</a>
                                                 <a href="info.php?id=4&cid=<?=$client['id']?>" role="button" class="btn btn-warning" >Schedule</a>
@@ -2062,7 +2055,187 @@ if ($user->isLoggedIn()) {
                                 </table>
                             </div>
                         </div>
-                    <?php } ?>
+                    <?php }elseif($_GET['id'] == 8){ ?>
+                        <div class="col-md-offset-1 col-md-8">
+                            <?php $client=$override->get('clients','id', $_GET['cid'])[0]?>
+                            <div class="head clearfix">
+                                <div class="isw-ok"></div>
+                                <h1>Edit Client</h1>
+                            </div>
+                            <div class="block-fluid">
+                                <form id="validation" enctype="multipart/form-data" method="post">
+                                    <div class="row-form clearfix">
+                                        <div class="col-md-3">Study</div>
+                                        <div class="col-md-9">
+                                            <select name="position" style="width: 100%;" required>
+                                                <?php foreach ($override->getData('study') as $study) { ?>
+                                                    <option value="<?= $study['id'] ?>"><?= $study['name'] ?></option>
+                                                <?php } ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row-form clearfix">
+                                        <div class="col-md-3">ParticipantID:</div>
+                                        <div class="col-md-9">
+                                            <input value="<?=$client['participant_id']?>" class="validate[required]" type="text" name="participant_id" id="participant_id" />
+                                        </div>
+                                    </div>
+                                    <div class="row-form clearfix">
+                                        <div class="col-md-3">Date:</div>
+                                        <div class="col-md-9">
+                                            <input value="<?=$client['clinic_date']?>" class="validate[required,custom[date]]" type="text" name="clinic_date" id="clinic_date"/> <span>Example: 2010-12-01</span>
+                                        </div>
+                                    </div>
+                                    <div class="row-form clearfix">
+                                        <div class="col-md-3">First Name:</div>
+                                        <div class="col-md-9">
+                                            <input value="<?=$client['firstname']?>" class="validate[required]" type="text" name="firstname" id="firstname" />
+                                        </div>
+                                    </div>
+                                    <div class="row-form clearfix">
+                                        <div class="col-md-3">Last Name:</div>
+                                        <div class="col-md-9">
+                                            <input value="<?=$client['lastname']?>" class="validate[required]" type="text" name="lastname" id="lastname" />
+                                        </div>
+                                    </div>
+
+                                    <div class="row-form clearfix">
+                                        <div class="col-md-3">Date of Birth:</div>
+                                        <div class="col-md-9">
+                                            <input value="<?=$client['dob']?>" class="validate[required,custom[date]]" type="text" name="dob" id="dob"/> <span>Example: 2010-12-01</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row-form clearfix">
+                                        <div class="col-md-3">Age:</div>
+                                        <div class="col-md-9">
+                                            <input value="<?=$client['age']?>" class="validate[required]" type="text" name="age" id="age" />
+                                        </div>
+                                    </div>
+
+                                    <div class="row-form clearfix">
+                                        <div class="col-md-5">Client Image:</div>
+                                        <div class="col-md-7">
+                                            <input type="file" id="image" name="image"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="row-form clearfix">
+                                        <div class="col-md-3">Gender</div>
+                                        <div class="col-md-9">
+                                            <select name="gender" style="width: 100%;" required>
+                                                <option value="<?=$client['gender']?>"><?=$client['gender']?></option>
+                                                <option value="male">Male</option>
+                                                <option value="female">Female</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row-form clearfix">
+                                        <div class="col-md-3">ID Number:</div>
+                                        <div class="col-md-9">
+                                            <input value="<?=$client['id_number']?>" class="validate[required]" type="text" name="id_number" id="id_number" />
+                                        </div>
+                                    </div>
+
+                                    <div class="row-form clearfix">
+                                        <div class="col-md-3">Identification Type</div>
+                                        <div class="col-md-9">
+                                            <select name="id_type" style="width: 100%;" required>
+                                                <option value="<?=$client['id_type']?>"><?=$client['id_type']?></option>
+                                                <option value="Driving License">Driving License</option>
+                                                <option value="Voters ID">Voters ID</option>
+                                                <option value="National ID">National ID</option>
+                                                <option value="Employment ID">Employment ID</option>
+                                                <option value="Introductory Letter">Introductory Letter</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="row-form clearfix">
+                                        <div class="col-md-3">Population Group</div>
+                                        <div class="col-md-9">
+                                            <select name="population_group" style="width: 100%;" required>
+                                                <option value="<?=$client['population_group']?>"><?=$client['population_group']?></option>
+                                                <option value="General Population">General Population</option>
+                                                <option value="Police and Prison Forces">Police and Prison Forces</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="row-form clearfix">
+                                        <div class="col-md-3">Marital Status</div>
+                                        <div class="col-md-9">
+                                            <select name="marital_status" style="width: 100%;" required>
+                                                <option value="<?=$client['marital_status']?>"><?=$client['marital_status']?></option>
+                                                <option value="Single">Single</option>
+                                                <option value="Married">Married</option>
+                                                <option value="Divorced">Divorced</option>
+                                                <option value="Separated">Separated</option>
+                                                <option value="Widower">Widower/Widow</option>
+                                                <option value="Cohabit">Cohabit</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="row-form clearfix">
+                                        <div class="col-md-3">Education Level</div>
+                                        <div class="col-md-9">
+                                            <select name="education_level" style="width: 100%;" required>
+                                                <option value="<?=$client['education_level']?>"><?=$client['education_level']?></option>
+                                                <option value="Not attended school">Not attended school</option>
+                                                <option value="Primary">Primary</option>
+                                                <option value="Secondary">Secondary</option>
+                                                <option value="Certificate">Certificate</option>
+                                                <option value="Diploma">Diploma</option>
+                                                <option value="Undergraduate degree">Undergraduate degree</option>
+                                                <option value="Postgraduate degree">Postgraduate degree</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row-form clearfix">
+                                        <div class="col-md-3">Workplace/station site:</div>
+                                        <div class="col-md-9"><input value="<?=$client['workplace']?>" class="" type="text" name="workplace" id="workplace" required /></div>
+                                    </div>
+                                    <div class="row-form clearfix">
+                                        <div class="col-md-3">Occupation:</div>
+                                        <div class="col-md-9"><input value="<?=$client['occupation']?>" class="" type="text" name="occupation" id="occupation" required /></div>
+                                    </div>
+                                    <div class="row-form clearfix">
+                                        <div class="col-md-3">Phone Number:</div>
+                                        <div class="col-md-9"><input value="<?=$client['phone_number']?>" class="" type="text" name="phone_number" id="phone" required /> <span>Example: 0700 000 111</span></div>
+                                    </div>
+                                    <div class="row-form clearfix">
+                                        <div class="col-md-3">Other Phone Number:</div>
+                                        <div class="col-md-9"><input value="<?=$client['other_phone']?>" class="" type="text" name="other_phone" id="other_phone" /> <span>Example: 0700 000 111</span></div>
+                                    </div>
+                                    <div class="row-form clearfix">
+                                        <div class="col-md-3">Residence Street:</div>
+                                        <div class="col-md-9"><input value="<?=$client['street']?>" class="" type="text" name="street" id="street" required /></div>
+                                    </div>
+                                    <div class="row-form clearfix">
+                                        <div class="col-md-3">Ward:</div>
+                                        <div class="col-md-9"><input value="<?=$client['ward']?>" class="" type="text" name="ward" id="ward" required /></div>
+                                    </div>
+
+                                    <div class="row-form clearfix">
+                                        <div class="col-md-3">Block Number:</div>
+                                        <div class="col-md-9"><input value="<?=$client['block_no']?>" class="" type="text" name="block_no" id="block_no"  /></div>
+                                    </div>
+                                    <div class="row-form clearfix">
+                                        <div class="col-md-3">Comments:</div>
+                                        <div class="col-md-9"><textarea name="comments" rows="4"><?=$client['comments']?></textarea> </div>
+                                    </div>
+                                    <div class="footer tar">
+                                        <input type="hidden" name="client_image" value="<?=$client['client_image']?>"/>
+                                        <input type="hidden" name="id" value="<?=$client['id'] ?>" />
+                                        <input type="submit" name="edit_client" value="Submit" class="btn btn-default">
+                                    </div>
+
+                                </form>
+                            </div>
+
+                        </div>
+                    <?php }?>
                 </div>
 
                 <div class="dr"><span></span></div>
