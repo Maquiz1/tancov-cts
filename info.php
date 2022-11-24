@@ -403,6 +403,9 @@ if ($user->isLoggedIn()) {
             }elseif (Input::get('visits')){
                 $data = $override->getData('visit');
                 $filename = 'Visits';
+            }elseif (Input::get('unscheduled_visits')){
+                $data = $override->getData('unscheduled');
+                $filename = 'Unscheduled visits';
             }
             elseif (Input::get('pre_screening')){
                 $data = $override->getData('pre_screening');
@@ -1425,15 +1428,16 @@ if ($user->isLoggedIn()) {
                                                         if($msv > 0){?>
                                                             <td><a href="#<?= $visit['id'] ?>" role="button" class="btn btn-danger"> Missed </a></td>
                                                             <!-- if you want to allow user to enter visit even when its missed uncomment and remove last td tag-->
-<!--                                                            <td>-->
-<!--                                                                <a href="#addVisit--><?//= $visit['id'] ?><!--" role="button" class="btn btn-info" data-toggle="modal">Add</a>-->
-<!--                                                                --><?php //if($visit['seq_no'] > 3){?>
-<!--                                                                    <a href="#addUnscheduled--><?//= $visit['id'] ?><!--" role="button" class="btn btn-info" data-toggle="modal">Add Unscheduled</a>-->
-<!--                                                                --><?php //}?>
-<!--                                                                --><?php //if($visit['visit_code'] == 'V3'){?>
-<!--                                                                    <a href="#addEnroll--><?//= $visit['id'] ?><!--" role="button" class="btn btn-info" data-toggle="modal">Add Enrollment</a>-->
-<!--                                                                --><?php //}?>
-<!--                                                            </td>-->
+                                                            <td>
+                                                                <a href="#addUnscheduled<?= $visit['id'] ?>" role="button" class="btn btn-info" data-toggle="modal">Add Unscheduled</a>
+<!--                                                                --><?php //if($visit['seq_no'] > 3){
+//                                                                    if($visit['seq_no'] < 11) {
+//                                                                        $sn = $visit['seq_no'] + 1;
+//                                                                        $n_sn = $override->getNews('visit', 'seq_no', $sn, 'client_id', $_GET['cid'])[0];
+//                                                                        if($user->dateDiff(date('Y-m-d'),$n_sn['visit_date']) > 0){?>
+<!--                                                                            <a href="#addUnscheduled--><?//= $visit['id'] ?><!--" role="button" class="btn btn-info" data-toggle="modal">Add Unscheduled</a>-->
+<!--                                                                        --><?php //}}}?>
+                                                            </td>
                                                             <td></td>
                                                         <?php }else {?>
                                                             <td><a href="#<?= $visit['id'] ?>" role="button" class="btn btn-warning">Pending</a></td>
@@ -2043,11 +2047,16 @@ if ($user->isLoggedIn()) {
                                     </tr>
                                     <tr>
                                         <td>3</td>
+                                        <td>Unscheduled Visit</td>
+                                        <td><form method="post"><input type="submit" name="unscheduled_visits" value="Download"></form> </td>
+                                    </tr>
+                                    <tr>
+                                        <td>4</td>
                                         <td>Pre screening</td>
                                         <td><form method="post"><input type="submit" name="pre_screening" value="Download"></form> </td>
                                     </tr>
                                     <tr>
-                                        <td>4</td>
+                                        <td>5</td>
                                         <td>Sites</td>
                                         <td><form method="post"><input type="submit" name="sites" value="Download"></form> </td>
                                     </tr>
