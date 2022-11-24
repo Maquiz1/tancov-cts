@@ -393,6 +393,26 @@ if ($user->isLoggedIn()) {
                 $pageError = $validate->errors();
             }
         }
+        elseif (Input::get('edit_unscheduled')) {
+            $validate = $validate->check($_POST, array(
+                'reasons' => array(
+                    'required' => true,
+                ),
+            ));
+            if ($validate->passed()) {
+                try {
+                    $user->updateRecord('unscheduled', array(
+                        'visit_date' => Input::get('visit_date'),
+                        'reasons' => Input::get('reasons'),
+                    ),Input::get('id'));
+                    $successMessage = 'Visit Successful Updated';
+                } catch (Exception $e) {
+                    die($e->getMessage());
+                }
+            } else {
+                $pageError = $validate->errors();
+            }
+        }
 
         if($_GET['id'] == 7){
             $data = null;
@@ -1353,9 +1373,10 @@ if ($user->isLoggedIn()) {
                                     </div>
                                 </div>
                                 <div class="col-md-10">
+                                    <div class="pull-right"><a href="info.php?id=9&cid=<?=$_GET['cid']?>" role="button" class="btn btn-info" data-toggle="modal">View Unscheduled</a></div>
                                     <div class="head clearfix">
                                         <div class="isw-grid"></div>
-                                        <h1>Schedule</h1>
+                                        <h1>Unscheduled</h1>
                                         <ul class="buttons">
                                             <li><a href="#" class="isw-download"></a></li>
                                             <li><a href="#" class="isw-attachment"></a></li>
@@ -2243,6 +2264,129 @@ if ($user->isLoggedIn()) {
                                 </form>
                             </div>
 
+                        </div>
+                    <?php }elseif ($_GET['id'] == 9){?>
+                        <div class="col-md-12">
+                            <?php $patient = $override->get('clients', 'id', $_GET['cid'])[0]?>
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <div class="ucard clearfix">
+                                        <div class="right">
+                                            <div class="image">
+                                                <?php if($patient['client_image'] !='' || is_null($patient['client_image'])){$img=$patient['client_image'];}else{$img='img/users/blank.png';}?>
+                                                <a href="#"><img src="<?=$img?>" width="300" class="img-thumbnail"></a>
+                                            </div>
+                                            <h5><?='Name: '.$patient['firstname'].' '.$patient['lastname'].' Age: '.$patient['age']?></h5>
+                                            <h4><strong style="font-size: larger">Study ID: <?=$patient['participant_id']?></strong></h4>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-10">
+                                    <div class="head clearfix">
+                                        <div class="isw-grid"></div>
+                                        <h1>Schedule</h1>
+                                        <ul class="buttons">
+                                            <li><a href="#" class="isw-download"></a></li>
+                                            <li><a href="#" class="isw-attachment"></a></li>
+                                            <li>
+                                                <a href="#" class="isw-settings"></a>
+                                                <ul class="dd-list">
+                                                    <li><a href="#"><span class="isw-plus"></span> New document</a></li>
+                                                    <li><a href="#"><span class="isw-edit"></span> Edit</a></li>
+                                                    <li><a href="#"><span class="isw-delete"></span> Delete</a></li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="block-fluid">
+                                        <table cellpadding="0" cellspacing="0" width="100%" class="table">
+                                            <thead>
+                                            <tr>
+                                                <th width="5%">#</th>
+                                                <th width="5%">Visit Code</th>
+                                                <th width="10%">Visit Type</th>
+                                                <th width="10%">Visit Date</th>
+                                                <th width="45%">Reasons</th>
+                                                <th width="15%">Action</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <?php $x=1;foreach ($override->get('unscheduled', 'client_id', $_GET['cid']) as $visit) {?>
+                                                <tr>
+                                                    <td><?=$x?></td>
+                                                    <td> <?=$visit['visit_code'].'.'.$visit['seq'] ?></td>
+                                                    <td> Unscheduled </td>
+                                                    <td> <?=$visit['visit_date'] ?></td>
+                                                    <td> <?=$visit['reasons'] ?></td>
+                                                    <td><a href="#editUnscheduled<?= $visit['id'] ?>" role="button" class="btn btn-info" data-toggle="modal">Edit</a></td>
+                                                </tr>
+                                                <div class="modal fade" id="editUnscheduled<?=$visit['id'] ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <form id="validation" method="post">
+                                                                <div class="modal-header">
+                                                                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                                                    <h4>Add Unscheduled Visit</h4>
+                                                                </div>
+                                                                <div class="modal-body modal-body-np">
+                                                                    <div class="row">
+                                                                        <?php $unscheduled=$override->getlastRow1('unscheduled','visit_code',$visit['visit_code'],'client_id',$visit['client_id'], 'id');
+                                                                        if($unscheduled){$sq=$unscheduled[0]['seq']+1;}else{$sq=1;}?>
+                                                                        <div class="block-fluid">
+                                                                            <div class="row-form clearfix">
+                                                                                <div class="col-md-3">Visit:</div>
+                                                                                <div class="col-md-9"><input type="text" name="name" value="<?=$visit['visit_code'].'.'.$visit['seq']?>" disabled /></div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="block-fluid">
+                                                                            <div class="row-form clearfix">
+                                                                                <div class="col-md-3">Visit Type:</div>
+                                                                                <div class="col-md-9"><input type="text" name="name" value="Unscheduled" disabled /></div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="row-form clearfix">
+                                                                            <div class="col-md-3">Status</div>
+                                                                            <div class="col-md-9">
+                                                                                <select name="visit_status" style="width: 100%;" disabled>
+                                                                                    <option value="<?=$visit['status']?>"><?php if($visit['status']==1){echo'Attended';}elseif ($visit['status']==2){echo'Not Attended';}else{echo 'Select';}?></option>
+                                                                                    <option value="1">Attended</option>
+                                                                                    <option value="2">Not Attended</option>
+                                                                                </select>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="row-form clearfix">
+                                                                            <div class="col-md-3">Date:</div>
+                                                                            <div class="col-md-9">
+                                                                                <input value="<?=$visit['visit_date']?>" class="validate[required,custom[date]]" type="text" name="visit_date" id="visit_date"/> <span>Example: 2010-12-01</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="row-form clearfix">
+                                                                            <div class="col-md-3">Reasons:</div>
+                                                                            <div class="col-md-9">
+                                                                                <textarea name="reasons" rows="4" required><?=$visit['reasons']?></textarea>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="dr"><span></span></div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <input type="hidden" name="id" value="<?=$visit['id'] ?>">
+                                                                    <input type="hidden" name="cid" value="<?=$visit['client_id'] ?>">
+                                                                    <input type="submit" name="edit_unscheduled" class="btn btn-warning" value="Save">
+                                                                    <button class="btn btn-default" data-dismiss="modal" aria-hidden="true">Close</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <?php $x++;} ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     <?php }?>
                 </div>
