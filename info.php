@@ -1400,7 +1400,10 @@ if ($user->isLoggedIn()) {
                                     </div>
                                 </div>
                                 <div class="col-md-10">
-                                    <div class="pull-right"><a href="info.php?id=9&cid=<?=$_GET['cid']?>" role="button" class="btn btn-info" data-toggle="modal">View Unscheduled</a></div>
+                                    <div class="pull-right">
+                                        <a href="info.php?id=9&cid=<?=$_GET['cid']?>" role="button" class="btn btn-info" data-toggle="modal">View Unscheduled</a>&nbsp;&nbsp;
+                                        <a href="schedule.php?cid=<?=$_GET['cid']?>" role="button" class="btn btn-warning" >Print Page</a>
+                                    </div>
                                     <div class="head clearfix">
                                         <div class="isw-grid"></div>
                                         <h1>Unscheduled</h1>
